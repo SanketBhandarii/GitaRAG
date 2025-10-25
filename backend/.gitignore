@@ -1,0 +1,62 @@
+# Python cache / bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.env/
+.venv/
+env/
+ENV/
+*.env
+
+# Environment and API keys
+.env
+*.env.local
+.DS_Store
+
+# VSCode and IDE settings
+.vscode/
+.idea/
+
+# Logs and temp files
+*.log
+*.out
+*.bak
+*.swp
+*.tmp
+*.pid
+
+# Compiled files
+*.so
+*.dll
+*.dylib
+*.pyd
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Cache directories
+.cache/
+.pytest_cache/
+__pypackages__/
+.mypy_cache/
+coverage.xml
+htmlcov/
+
+# Data or uploads (if any)
+data/
+uploads/
+tmp/
+*.pdf
+
+# macOS
+.DS_Store
+
+# FastAPI / Uvicorn auto reload cache
+*.db
+*.sqlite3
