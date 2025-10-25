@@ -24,7 +24,7 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center h-full space-y-4">
               <Image src="/krish.jpg" alt="Krishna" width={100} height={100} className="rounded-full" />
               <h1 className="text-4xl font-bold text-center">Talk with bhagavad gita, find clarity </h1>
-              <p className="text-zinc-400">Answers for life’s toughest questions, straight from the Gita</p>
+              <p className="text-zinc-400 text-center">Answers for life’s questions, straight from the Gita</p>
             </div>
           ) : (
             <MessageList messages={messages} isLoading={isLoading} />
