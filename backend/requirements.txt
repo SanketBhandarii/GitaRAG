@@ -1,9 +1,7 @@
 fastapi
-uvicorn
 langchain==0.3.26
 langchain-community==0.3.26
 langchain-pinecone==0.2.8
 langchain_mistralai 
 python-dotenv
 pypdf
-sentence-transformers
