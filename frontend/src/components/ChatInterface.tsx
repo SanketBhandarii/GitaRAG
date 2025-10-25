@@ -32,6 +32,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ setMessages, setIsLoading
   const [prompt, setPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
   const stopGeneration = () => {
     abortControllerRef.current?.abort();
@@ -51,7 +52,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ setMessages, setIsLoading
     abortControllerRef.current = new AbortController();
 
     try {
-      const res = await fetch("http://localhost:8000/query", {
+      const res = await fetch(`${BACKEND_URL}/query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_query: userPrompt }),
