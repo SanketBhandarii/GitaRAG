@@ -52,7 +52,7 @@ export default function Home() {
             <MessageList messages={messages} isLoading={isLoading} />
           )}
         </div>
-        <div className="flex-shrink-0 px-4 pb-8 pt-2 bg-transparent">
+        <div className="flex-shrink-0 px-4 pb-8 pt-4 bg-transparent">
           <ChatInterface
             setMessages={setMessages}
             setIsLoading={setIsLoading}
