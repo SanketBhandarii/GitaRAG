@@ -17,18 +17,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white relativ overflow-hiddene">
-      <div className="absolute inset-0 w-full h-full">
-        <SparklesCore
-          id="tsparticlesfullpage"
-          background="transparent"
-          minSize={0.6}
-          maxSize={1.4}
-          particleDensity={100}
-          particleColor="#FFFFFF"
-          className="w-full h-full"
-        />
-      </div>
+    <div className="min-h-screen bg-zinc-950 text-white">
       <div className="max-w-3xl mx-auto flex flex-col h-screen">
         <div className="flex-1 overflow-y-auto px-4 py-8 scrollbar-hide">
           {messages.length === 0 && !isLoading ? (
