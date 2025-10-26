@@ -17,7 +17,7 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white relative">
+    <div className="min-h-screen bg-zinc-950 text-white relativ overflow-hiddene">
       <div className="absolute inset-0 w-full h-full">
         <SparklesCore
           id="tsparticlesfullpage"
