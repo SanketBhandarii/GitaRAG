@@ -62,6 +62,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ setMessages, setIsLoading
       if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
       
       const data = await res.json();
+      setPrompt("");
       setMessages((prev) => [...prev, { role: "assistant", content: data.answer, id: (Date.now() + 1).toString() }]);
     } catch (error: any) {
       if (error.name !== "AbortError") {

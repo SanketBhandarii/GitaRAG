@@ -30,7 +30,7 @@ export default function Home() {
         />
       </div>
       <div className="relative z-10 max-w-3xl mx-auto h-full flex flex-col">
-        <div className="flex-1 overflow-y-auto px-4 py-8 pb-4">
+        <div className="flex-1 overflow-y-auto px-4 py-8 pb-4 scrollbar-hide">
           {messages.length === 0 && !isLoading ? (
             <div className="flex flex-col items-center justify-center min-h-full space-y-4">
               <Image
