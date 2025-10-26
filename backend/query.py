@@ -1,9 +1,7 @@
-from fastapi import FastAPI
-from pydantic import BaseModel
 from langchain_mistralai import ChatMistralAI, MistralAIEmbeddings
 from langchain_pinecone import PineconeVectorStore
 from pinecone import Pinecone
-from langchain.memory import ConversationBufferMemory
+from langchain_community.chat_message_histories import ChatMessageHistory
 from dotenv import load_dotenv
 import os
 
@@ -15,12 +13,7 @@ embeddings = MistralAIEmbeddings(model="mistral-embed")
 vector_store = PineconeVectorStore(index=index, embedding=embeddings)
 chat = ChatMistralAI(model="mistral-large-latest")
 
-memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
-
-app = FastAPI()
-
-class QueryRequest(BaseModel):
-    user_query: str
+chat_history = ChatMessageHistory()
 
 def similarity_search(query: str, k: int = 3):
     return vector_store.similarity_search(query, k=k)
@@ -28,34 +21,36 @@ def similarity_search(query: str, k: int = 3):
 def get_gita_reply(query: str):
     context_docs = similarity_search(query, k=3)
     context = "\n\n".join([doc.page_content for doc in context_docs])
+    
+    history_text = ""
+    messages = chat_history.messages
+    if messages:
+        for msg in messages:
+            role = "User" if msg.type == "human" else "Krishna"
+            history_text += f"{role}: {msg.content}\n"
+    
+    prompt = f"""You are Krishna - wise, friendly, and conversational like a good friend.
 
-    prompt = f"""You are Krishna from the Bhagavad Gita. Speak like a wise, compassionate friend who gives practical advice.
+    Gita Context:
+    {context}
 
-Rules:
-- NO stage directions like *laughs*, *smiles*, (grins), etc.
-- NO unnecessary quotes around words
-- Write naturally like you're having a real conversation
-- Be direct and clear, not dramatic or theatrical
-- Use the Gita wisdom to give practical, actionable advice
-- If someone asks a question, answer it directly first, then explain
-- If someone just wants to chat, be warm and conversational
-- Translate any Sanskrit terms simply and clearly
-- Keep paragraphs short and readable
+    Previous Chat:
+    {history_text}
 
-Gita Context:
-{context}
+    Current: {query}
 
-User: {query}
+    How to respond:
+    - Answer in simple ENGLISH only regardless of the user's language or context language.
+    - Talk naturally like a supportive friend, not overly formal or preachy
+    - Don't assume negativity or problems unless they explicitly mention them
+    - Share Gita wisdom when it's relevant and helpful
+    - Be warm and talkative, not cold or robotic
+    - No stage directions like *smiles* or (laughs)
 
-Respond as Krishna would - wise, direct, and genuinely helpful:"""
-
-    memory.chat_memory.add_user_message(query)
+    Answer :"""
+    
+    chat_history.add_user_message(query)
     response = chat.invoke(prompt)
-    memory.chat_memory.add_ai_message(response.content)
-
+    chat_history.add_ai_message(response.content)
+    
     return response.content
-
-@app.post("/query")
-def query_gita(req: QueryRequest):
-    answer = get_gita_reply(req.user_query)
-    return {"answer": answer}
