@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { SparklesCore } from "../components/ui/sparkles";
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -20,7 +21,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased bg-black text-white`}>
+      <body className={`${inter.variable} antialiased text-white`}>
+       
         {children}
       </body>
     </html>
