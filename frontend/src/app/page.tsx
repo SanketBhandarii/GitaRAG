@@ -17,11 +17,22 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      <div className="max-w-3xl mx-auto flex flex-col h-screen">
-        <div className="flex-1 overflow-y-auto px-4 py-8 scrollbar-hide">
+    <div className="fixed inset-0 bg-zinc-950 text-white overflow-hidden">
+      <div className="absolute inset-0 w-full h-full">
+        <SparklesCore
+          id="tsparticlesfullpage"
+          background="transparent"
+          minSize={0.6}
+          maxSize={1.4}
+          particleDensity={100}
+          particleColor="#FFFFFF"
+          className="w-full h-full"
+        />
+      </div>
+      <div className="relative z-10 max-w-3xl mx-auto h-full flex flex-col">
+        <div className="flex-1 overflow-y-auto px-4 py-8 pb-4">
           {messages.length === 0 && !isLoading ? (
-            <div className="flex flex-col items-center justify-center h-full space-y-4">
+            <div className="flex flex-col items-center justify-center min-h-full space-y-4">
               <Image
                 src="/krish.jpg"
                 alt="Krishna"
@@ -34,14 +45,14 @@ export default function Home() {
                 , find clarity
               </h1>
               <p className="text-zinc-400 text-center">
-                Answers for life’s questions, straight from the Gita
+                Answers for life's questions, straight from the Gita
               </p>
             </div>
           ) : (
             <MessageList messages={messages} isLoading={isLoading} />
           )}
         </div>
-        <div className="px-4 py-6">
+        <div className="flex-shrink-0 px-4 pb-8 pt-2 bg-transparent">
           <ChatInterface
             setMessages={setMessages}
             setIsLoading={setIsLoading}
