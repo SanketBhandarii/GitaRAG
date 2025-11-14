@@ -66,7 +66,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ setMessages, setIsLoading
       setMessages((prev) => [...prev, { role: "assistant", content: data.answer, id: (Date.now() + 1).toString() }]);
     } catch (error: any) {
       if (error.name !== "AbortError") {
-        setMessages((prev) => [...prev, { role: "assistant", content: "Error: Failed to get response", id: (Date.now() + 1).toString() }]);
+        setMessages((prev) => [...prev, { role: "assistant", content: "Please try to refresh page", id: (Date.now() + 1).toString() }]);
       }
     } finally {
       setIsGenerating(false);
