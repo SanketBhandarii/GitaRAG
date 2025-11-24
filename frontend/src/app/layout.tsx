@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import AudioPlayer from "../components/AudioPlayer";
+
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -12,17 +14,14 @@ export const metadata: Metadata = {
   description: "A chatbot that answers questions about the Bhagavad Gita.",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark">
       <head>
         <meta name="theme-color" content="#09090b" />
       </head>
       <body className={`${inter.variable} antialiased text-white bg-zinc-950`}>
+        <AudioPlayer />
         {children}
       </body>
     </html>
