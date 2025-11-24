@@ -5,3 +5,6 @@ langchain-pinecone==0.2.8
 langchain_mistralai 
 python-dotenv
 pypdf
+google-genai
+langchain-google-genai
+groq
