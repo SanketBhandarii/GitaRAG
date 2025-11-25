@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from "react";
 import UserMessage from "./UserMessage";
 import AssistantMessage from "./AssitantMessage";
 import { Shimmer } from '@/src/ai-elements/shimmer';
+import Image from "next/image";
 
 interface Message {
   role: "user" | "assistant";
@@ -24,6 +25,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, isLoading }) => {
 
   return (
     <div className="space-y-6">
+      
       {messages.map((message) => (
         <div key={message.id}>
           {message.role === "user" ? <UserMessage content={message.content} /> : <AssistantMessage content={message.content} />}
