@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 export default function AudioPlayer() {
   useEffect(() => {
-    const audio = new Audio("/gita.m4a");
+    const audio = new Audio("/gitaaudio.m4a");
     audio.loop = false;
     audio.volume = 0.8;
 
