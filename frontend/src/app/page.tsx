@@ -5,6 +5,7 @@ import ChatInterface from "../components/ChatInterface";
 import MessageList from "../components/MessageList";
 import Image from "next/image";
 import { SparklesCore } from "../components/ui/sparkles";
+import IntroScreen from "../components/IntroScreen";
 
 interface Message {
   role: "user" | "assistant";
@@ -15,6 +16,11 @@ interface Message {
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
+
+  if (showIntro) {
+    return <IntroScreen onComplete={() => setShowIntro(false)} />;
+  }
 
   return (
     <div className="fixed inset-0 bg-zinc-950 text-white overflow-hidden">
@@ -23,9 +29,9 @@ export default function Home() {
           id="tsparticlesfullpage"
           background="transparent"
           minSize={0.6}
-          maxSize={1.4}
+          maxSize={2.6}
           particleDensity={100}
-          particleColor="#FFFFFF"
+          particleColor="#5845ad"
           className="w-full h-full"
         />
       </div>

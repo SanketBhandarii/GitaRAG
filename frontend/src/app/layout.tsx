@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import AudioPlayer from "../components/AudioPlayer";
 
 
 const inter = Inter({
@@ -21,7 +20,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="theme-color" content="#09090b" />
       </head>
       <body className={`${inter.variable} antialiased text-white bg-zinc-950`}>
-        <AudioPlayer />
         {children}
       </body>
     </html>
