@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { motion, Variants } from "framer-motion";
+import { motion } from "framer-motion";
 import { SparklesCore } from "./ui/sparkles";
 import Welcome from "./Welcome";
 
@@ -11,18 +11,6 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
   const [stage, setStage] = useState<"welcome" | "animation">("welcome");
   const [isExiting, setIsExiting] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const spinSlow: Variants = {
-    animate: { rotate: 360, transition: { duration: 40, repeat: Infinity, ease: "linear" } },
-  };
-
-  const spinFast: Variants = {
-    animate: { rotate: -360, transition: { duration: 15, repeat: Infinity, ease: "linear" } },
-  };
-
-  const spinClockwise: Variants = {
-    animate: { rotate: 360, transition: { duration: 25, repeat: Infinity, ease: "linear" } },
-  };
 
   const handleBegin = () => {
     if (!audioRef.current) {
@@ -63,104 +51,115 @@ const IntroScreen: React.FC<IntroScreenProps> = ({ onComplete }) => {
       animate={{ opacity: isExiting ? 0 : 1 }}
       transition={{ duration: 1 }}
     >
-      <div className="absolute inset-0 w-full h-full pointer-events-none">
+      <div className="absolute inset-0 overflow-hidden z-0">
+        <motion.div 
+          className="absolute inset-[-50%] w-[200%] h-[200%] bg-cover bg-center"
+          style={{ backgroundImage: "url('/cosmic-bg.png')" }}
+          initial={{ scale: 1, opacity: 0, rotate: 0 }}
+          animate={{ 
+            scale: [1, 1.15, 1], 
+            opacity: 0.1, 
+            rotate: 180 
+          }}
+          transition={{ 
+            opacity: { duration: 15, ease: "easeOut" },
+            scale: { duration: 20, repeat: Infinity, ease: "easeInOut" },
+            rotate: { duration: 240, repeat: Infinity, ease: "linear" }
+          }}
+        />
+
+        <motion.div 
+          className="absolute inset-[-50%] w-[200%] h-[200%] bg-cover bg-center mix-blend-screen"
+          style={{ backgroundImage: "url('/cosmic-bg.png')" }}
+          initial={{ scale: 1.1, opacity: 0, rotate: 0 }}
+          animate={{ 
+            scale: [1.1, 1.25, 1.1], 
+            opacity: 0.2, 
+            rotate: -180 
+          }}
+          transition={{ 
+            opacity: { duration: 15, ease: "easeOut" },
+            scale: { duration: 25, repeat: Infinity, ease: "easeInOut" },
+            rotate: { duration: 300, repeat: Infinity, ease: "linear" }
+          }}
+        />
+      </div>
+
+      <div className="absolute inset-0 bg-black/40 z-0" />
+
+      <div className="absolute inset-0 w-full h-full pointer-events-none z-10">
         <SparklesCore
           id="intro-sparkles"
           background="transparent"
           minSize={0.5}
-          maxSize={1.5}
-          particleDensity={70}
-          particleColor="#5ec7ff"
-          className="w-full h-full opacity-40"
+          maxSize={1}
+          particleDensity={80}
+          particleColor="#ffffff"
+          className="w-full h-full opacity-100"
         />
+      </div>
+
+      <div className="relative z-20 flex items-center justify-center w-full h-full perspective-[1000px]">
         
-      </div>
-
-      <div className="relative flex items-center justify-center">
-        <motion.div
-          className="absolute rounded-full border border-zinc-800/20"
-          style={{ width: "90vw", height: "90vw", maxWidth: "800px", maxHeight: "800px" }}
-          animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.3, 0] }}
-          transition={{ duration: 4, repeat: Infinity, ease: "easeOut" }}
+        <motion.div 
+            className="absolute w-[min(800px,80vw)] aspect-square rounded-full border-[1px] border-white/10"
+            animate={{ rotateX: 70, rotateZ: 360 }}
+            transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.div 
+            className="absolute w-[min(600px,60vw)] aspect-square rounded-full border-[1px] border-white/20 border-dashed"
+            animate={{ rotateX: 70, rotateZ: -360 }}
+            transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
         />
 
-        <motion.div className="absolute flex items-center justify-center w-[500px] h-[500px] sm:w-[600px] sm:h-[600px] opacity-30" variants={spinSlow} animate="animate">
-          {Array.from({ length: 12 }).map((_, i) => (
-            <div key={i} className="absolute w-full h-[1px] bg-gradient-to-r from-transparent via-zinc-500 to-transparent"
-              style={{ transform: `rotate(${i * 30}deg)` }} />
-          ))}
-          <div className="absolute inset-4 rounded-full border border-dashed border-zinc-700/40" />
-        </motion.div>
+        <motion.div 
+            className="absolute w-[min(900px,90vw)] aspect-square rounded-full border-[1px] border-white/5"
+            animate={{ rotateY: 45, rotateZ: 360 }}
+            transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
+        />
 
-        <motion.div className="absolute w-[350px] h-[350px] sm:w-[450px] sm:h-[450px] flex items-center justify-center mix-blend-screen" variants={spinClockwise} animate="animate">
-          <div className="absolute inset-0 border border-zinc-600/30 rotate-45" />
-          <div className="absolute inset-0 border border-zinc-600/30 rotate-12" />
-          <div className="absolute inset-0 border border-zinc-600/30 -rotate-12" />
-        </motion.div>
-
-        <motion.div className="absolute w-[100px] h-[100px] sm:w-[180px] sm:h-[180px] rounded-full border border-zinc-500/10 shadow-[0_0_60px_rgba(255,255,255,0.05)]" variants={spinFast} animate="animate">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="absolute top-0 left-0 w-1.5 h-1.5 bg-zinc-400 rounded-full shadow-[0_0_10px_white]"
-              style={{ transform: `translateX(-50%) rotate(${i * 45}deg) translateY(-150px)` }} />
-          ))}
-        </motion.div>
-
-        <motion.div className="absolute w-[220px] h-[220px] sm:w-[280px] sm:h-[280px] rounded-full border-[1px] border-zinc-400/20 flex items-center justify-center"
-          animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}>
-          {Array.from({ length: 24 }).map((_, i) => (
-            <div key={i} className="absolute h-3 w-[1px] bg-zinc-500"
-              style={{ top: '50%', left: '50%', transform: `translate(-50%, -50%) rotate(${i * 15}deg) translateY(-110px)` }} />
-          ))}
-        </motion.div>
-
-        <div className="relative z-10 flex items-center justify-center w-48 h-48 bg-black rounded-full shadow-[0_0_100px_rgba(255,255,255,0.25)] ring-2 ring-zinc-700/50">
-          <div className="absolute inset-0 rounded-full bg-gradient-to-br from-zinc-800/60 via-zinc-900/40 to-black blur-3xl" />
-
-          <svg viewBox="0 0 200 200" className="absolute w-full h-full opacity-100">
-            <motion.g style={{ transformOrigin: "100px 100px" }} animate={{ rotate: 360 }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }}>
-              {Array.from({ length: 16 }).map((_, i) => {
-                const angle = (i * 360) / 16;
-                return (
-                  <motion.g key={i} style={{ transformOrigin: "100px 100px", transform: `rotate(${angle}deg)` }}
-                    animate={{ opacity: [0.4, 1, 0.4] }}
-                    transition={{ duration: 2, delay: i * 0.125, repeat: Infinity, ease: "easeInOut" }}>
-                    <line x1="100" y1="40" x2="100" y2="55" stroke="#a1a1aa" strokeWidth="2.5" strokeLinecap="round" />
-                    <circle cx="100" cy="48" r="2" fill="#d4d4d8" />
-                  </motion.g>
-                );
-              })}
-            </motion.g>
-
-
-            
-
-            <motion.circle cx="100" cy="100" r="25" fill="none" stroke="url(#innerGlow)" strokeWidth="1.5"
-              animate={{ scale: [1, 1.15, 1] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
-              style={{ transformOrigin: "100px 100px" }} />
-
-            {[0, 60, 120, 180, 240, 300].map((angle) => (
-              <motion.line key={angle} x1="100" y1="100" x2="100" y2="75" stroke="url(#timeRay)" strokeWidth="3" strokeLinecap="round" opacity="0.7"
-                style={{ transformOrigin: "100px 100px", transform: `rotate(${angle}deg)` }}
-                animate={{ opacity: [0.4, 0.9, 0.4] }}
-                transition={{ duration: 2, delay: angle / 360, repeat: Infinity, ease: "easeInOut" }} />
-            ))}            
-          </svg>
-
-          <motion.div className="relative z-30 text-7xl font-bold text-white drop-shadow-[0_0_40px_rgba(255,255,255,0.8)]"
-            animate={{ scale: [1, 1.12, 1], textShadow: ["0 0 40px rgba(255,255,255,0.8)", "0 0 60px rgba(255,255,255,1)", "0 0 40px rgba(255,255,255,0.8)"] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}>
-            ॐ
-          </motion.div>
+        <div className="absolute inset-0 flex items-center justify-center">
+             {Array.from({ length: 3 }).map((_, i) => (
+                 <motion.div 
+                    key={i}
+                    className="absolute w-[2px] h-[120vh] bg-gradient-to-b from-transparent via-white/30 to-transparent"
+                    style={{ rotate: i * 60 }}
+                    animate={{ rotate: [i * 60, i * 60 + 360] }}
+                    transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                 />
+             ))}
         </div>
+
+        <motion.div 
+            className="relative flex items-center justify-center w-[90vw] max-w-[400px] aspect-square"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 2, ease: "circOut" }}
+        >
+            <div className="absolute inset-0 bg-orange-500/5 rounded-full blur-[80px] animate-pulse" />
+            
+            <motion.div
+                className="relative z-30 text-[clamp(6rem,20vw,9rem)] font-bold text-transparent bg-clip-text bg-gradient-to-b from-white via-orange-100 to-orange-500 drop-shadow-[0_0_50px_rgba(255,165,0,0.4)] flex items-center justify-center pb-4"
+                style={{ lineHeight: 1.5, paddingBottom: '20px' }} 
+                animate={{ 
+                    filter: ["brightness(1)", "brightness(1.2)", "brightness(1)"],
+                    scale: [1, 1.05, 1]
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            >
+                ॐ
+            </motion.div>
+        </motion.div>
+
       </div>
 
-      <motion.div className="absolute bottom-12 z-50 flex flex-col items-center gap-5"
-        initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5, duration: 1.2 }}>
+      <motion.div className="absolute bottom-8 sm:bottom-16 z-50"
+        initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 2, duration: 1 }}>
         <motion.button onClick={handleComplete}
-          className="group relative px-10 py-3 bg-gradient-to-r from-zinc-900/80 via-zinc-800/60 to-zinc-900/80 border border-zinc-700/70 rounded-full text-zinc-400 text-[11px] font-semibold tracking-[0.25em] overflow-hidden backdrop-blur-lg shadow-[0_0_30px_rgba(0,0,0,0.5)] cursor-pointer"
+          className="group relative px-8 sm:px-12 py-3 sm:py-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-full overflow-hidden transition-all duration-300 hover:bg-white/10 hover:border-white/30 hover:shadow-[0_0_30px_rgba(255,255,255,0.2)] cursor-pointer"
          >
-          <span className="relative z-10 group-hover:text-zinc-200 transition-colors duration-300">SKIP SEQUENCE</span>
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out" />
+          <span className="relative z-10 text-white/70 text-xs sm:text-sm font-bold tracking-[0.3em] sm:tracking-[0.4em] group-hover:text-white transition-colors duration-300">SKIP</span>
         </motion.button>
       </motion.div>
     </motion.div>
