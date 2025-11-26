@@ -78,10 +78,10 @@ Respond now following all rules.
     chat_history.add_user_message(query)
 
     response = chat.chat.completions.create(
-        model="openai/gpt-oss-120b",
+        model="llama-3.3-70b-versatile",
         temperature=0.6,
         top_p=0.95,
-        max_completion_tokens=1024,
+        max_tokens=1024,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
