@@ -57,7 +57,7 @@ Rules:
      [/VERSE]
 4. After the tile, continue your explanation normally.
 5. Do NOT invent verses. Only use verses you know.
-6. English should be simple.
+6. English should be very simple.
 7. Respond in the user's language.
 8. Avoid medical/legal/harmful advice.
 
@@ -78,7 +78,7 @@ Respond now following all rules.
     chat_history.add_user_message(query)
 
     response = chat.chat.completions.create(
-        model="qwen/qwen3-32b",
+        model="openai/gpt-oss-120b",
         temperature=0.6,
         top_p=0.95,
         max_completion_tokens=1024,
@@ -89,7 +89,7 @@ Respond now following all rules.
     )
 
     reply = response.choices[0].message.content
-    reply = re.sub(r"<think>.*?</think>", "", reply, flags=re.DOTALL).strip()
+    # reply = re.sub(r"<think>.*?</think>", "", reply, flags=re.DOTALL).strip()
 
     chat_history.add_ai_message(reply)
     return reply
