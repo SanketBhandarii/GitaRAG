@@ -4,17 +4,11 @@
 
 ### 🪷 *Ancient wisdom, modern tech. Chat with the Bhagavad Gita.*
 
-<br>
-
 **[🚀 Try it live → gitarag.vercel.app](https://gitarag.vercel.app)**
-
-<br>
 
 </div>
 
 ---
-
-<br>
 
 <div align="center">
 
