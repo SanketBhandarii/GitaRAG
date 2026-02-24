@@ -9,55 +9,76 @@ import re
 
 load_dotenv()
 
-pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
-index = pc.Index("gita")
-embeddings = MistralAIEmbeddings(model="mistral-embed")
-vector_store = PineconeVectorStore(index=index, embedding=embeddings)
+# Pinecone init — wrapped so the server still starts even if key is invalid
+pc = None
+index = None
+vector_store = None
+
+try:
+    pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+    index = pc.Index("gita")
+    embeddings = MistralAIEmbeddings(model="mistral-embed")
+    vector_store = PineconeVectorStore(index=index, embedding=embeddings)
+    print("[OK] Pinecone + Mistral embeddings connected.")
+except Exception as e:
+    print(f"[WARNING] Pinecone init failed: {e}")
+    print("[WARNING] /query endpoint will not work until this is fixed.")
+    embeddings = None
 
 chat = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 chat_history = ChatMessageHistory()
 
+
 def is_harmful_query(q: str):
     bad = [
-        "kill", "murder", "hurt someone", "attack",
-        "self harm", "suicide", "end my life",
-        "rape", "abuse", "violent", "bomb", "terror"
+        "kill",
+        "murder",
+        "hurt someone",
+        "attack",
+        "self harm",
+        "suicide",
+        "end my life",
+        "rape",
+        "abuse",
+        "violent",
+        "bomb",
+        "terror",
     ]
     q = q.lower()
     return any(b in q for b in bad)
 
+
 def similarity_search(query: str, k: int = 3):
     return vector_store.similarity_search(query, k=k)
 
-def get_gita_reply(query: str):
+
+def get_ai_reply(
+    query: str,
+    history_text: str = "",
+    religion: str = "hinduism",
+    scripture: str = "Bhagavad Gita",
+):
     if is_harmful_query(query):
         return "I cannot guide you toward harm. But I can help you calm your mind. Tell me what you are feeling."
 
     context_docs = similarity_search(query, k=3)
     context = "\n\n".join([d.page_content for d in context_docs])
 
-    if len(chat_history.messages) > 14:
-        chat_history.messages = chat_history.messages[-14:]
-
-    history_text = ""
-    for msg in chat_history.messages:
-        role = "User" if msg.type == "human" else "Krishna"
-        history_text += f"{role}: {msg.content}\n"
-
-    system_prompt = """
-You are Krishna from the Bhagavad Gita, speaking in simple modern English.
+    system_prompt = f"""
+You are a wise and compassionate guide representing the teachings of {scripture} from the {religion} tradition, speaking in simple modern English.
 
 Rules:
 1. Match the user’s tone.
-2. Use Gita wisdom only when natural.
-3. If using a verse:
-   - Write it in this format:
-     [VERSE title="Gita 5.20"]
+2. Use wisdom from the {scripture} only when natural.
+3. If using a verse or quote:
+   - Write it in this exact format:
+     [VERSE title="<Reference>"]
      <actual verse text here>
      [/VERSE]
+   - Example: [VERSE title="{scripture} Chapter 2, Verse 47"] You have a right to perform your prescribed duty... [/VERSE]
 4. After the tile, continue your explanation normally.
-5. Do NOT invent verses. Only use verses you know.
-6. English should be very simple.
+5. Do NOT invent verses. Only use verses you know from {scripture}.
+6. English should be very simple and easy to understand.
 7. Respond in the user's language.
 8. Avoid medical/legal/harmful advice.
 
@@ -75,8 +96,6 @@ User: {query}
 Respond now following all rules.
 """
 
-    chat_history.add_user_message(query)
-
     response = chat.chat.completions.create(
         model="llama-3.3-70b-versatile",
         temperature=0.6,
@@ -84,12 +103,9 @@ Respond now following all rules.
         max_tokens=1024,
         messages=[
             {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt}
-        ]
+            {"role": "user", "content": user_prompt},
+        ],
     )
 
     reply = response.choices[0].message.content
-    # reply = re.sub(r"<think>.*?</think>", "", reply, flags=re.DOTALL).strip()
-
-    chat_history.add_ai_message(reply)
     return reply

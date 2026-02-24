@@ -1,10 +1,23 @@
 fastapi
+uvicorn
+gunicorn
+python-dotenv
+
+# RAG / LLM
 langchain==0.3.26
 langchain-community==0.3.26
 langchain-pinecone==0.2.8
-langchain_mistralai 
-python-dotenv
+langchain_mistralai
+groq
 pypdf
 google-genai
 langchain-google-genai
-groq
+pinecone
+
+# Auth & DB
+sqlalchemy
+psycopg2-binary
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+email-validator

@@ -1,0 +1,288 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,400;0,600;1,400;1,600&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light mode — clean white */
+  
+    --background: 0 0% 100%;
+    --foreground: 215 25% 12%;
+
+    --card: 0 0% 99%;
+    --card-foreground: 215 25% 12%;
+
+    --popover: 0 0% 99%;
+    --popover-foreground: 215 25% 12%;
+
+    --primary: 200 90% 45%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 15% 94%;
+    --secondary-foreground: 215 25% 12%;
+
+    --muted: 210 15% 94%;
+    --muted-foreground: 215 15% 45%;
+
+    --accent: 200 60% 93%;
+    --accent-foreground: 200 90% 35%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 15% 88%;
+    --input: 210 15% 88%;
+    --ring: 200 90% 45%;
+
+    --radius: 0.75rem;
+
+    /* Religion accent colors */
+    --hindu: 28 90% 52%;
+    --islam: 152 60% 40%;
+    --christianity: 220 75% 50%;
+    --buddhism: 42 85% 50%;
+    --sikhism: 24 85% 48%;
+    --judaism: 245 50% 55%;
+
+    /* Glass */
+    --glass: 0 0% 100% / 0.75;
+    --glass-border: 0 0% 90% / 0.5;
+
+    /* Glow */
+    --glow-primary: 200 90% 45%;
+
+    --sidebar-background: 210 15% 97%;
+    --sidebar-foreground: 215 25% 20%;
+    --sidebar-primary: 200 90% 45%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 15% 93%;
+    --sidebar-accent-foreground: 215 25% 20%;
+    --sidebar-border: 210 15% 88%;
+    --sidebar-ring: 200 90% 45%;
+  }
+
+  .dark {
+    /* Dark mode — deep blackish with sky blue accents */
+    --background: 220 20% 6%;
+    --foreground: 210 20% 92%;
+
+    --card: 220 18% 9%;
+    --card-foreground: 210 20% 92%;
+
+    --popover: 220 18% 9%;
+    --popover-foreground: 210 20% 92%;
+
+    --primary: 200 85% 55%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 15% 13%;
+    --secondary-foreground: 210 20% 92%;
+
+    --muted: 220 15% 13%;
+    --muted-foreground: 210 12% 55%;
+
+    --accent: 200 40% 14%;
+    --accent-foreground: 200 85% 70%;
+
+    --destructive: 0 62% 35%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 15% 14%;
+    --input: 220 15% 14%;
+    --ring: 200 85% 55%;
+
+    /* Religion accent colors — brighter for dark */
+    --hindu: 28 90% 58%;
+    --islam: 152 65% 48%;
+    --christianity: 220 80% 60%;
+    --buddhism: 42 90% 55%;
+    --sikhism: 24 90% 55%;
+    --judaism: 245 55% 65%;
+
+    /* Glass */
+    --glass: 220 18% 10% / 0.65;
+    --glass-border: 210 20% 30% / 0.25;
+
+    /* Glow */
+    --glow-primary: 200 85% 55%;
+
+    --sidebar-background: 220 20% 7%;
+    --sidebar-foreground: 210 20% 88%;
+    --sidebar-primary: 200 85% 55%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 15% 12%;
+    --sidebar-accent-foreground: 210 20% 88%;
+    --sidebar-border: 220 15% 14%;
+    --sidebar-ring: 200 85% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    /* Every element gets instant smooth color transitions */
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      color 0.15s ease,
+      fill 0.15s ease,
+      stroke 0.15s ease,
+      box-shadow 0.2s ease;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: hsl(var(--glass));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid hsl(var(--glass-border));
+  }
+
+  .glass-subtle {
+    background: hsl(var(--glass));
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  .glow-primary {
+    box-shadow:
+      0 0 30px -5px hsl(var(--glow-primary) / 0.3),
+      0 0 60px -10px hsl(var(--glow-primary) / 0.15);
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(200 85% 70%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .shimmer {
+    background: linear-gradient(
+      110deg,
+      transparent 25%,
+      hsl(var(--primary) / 0.06) 37%,
+      transparent 63%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-in-out infinite;
+  }
+}
+
+/* Animations */
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes particle-drift {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) scale(0.5);
+    opacity: 0;
+  }
+}
+
+@keyframes orbit {
+  from {
+    transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.25);
+  }
+  50% {
+    box-shadow: 0 0 50px hsl(var(--primary) / 0.5);
+  }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease-out forwards;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.25);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.45);
+}
