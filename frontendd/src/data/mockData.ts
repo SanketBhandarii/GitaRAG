@@ -13,6 +13,7 @@ export type Scripture = {
   available: boolean;
   chapters?: number;
   verses?: number;
+  unitType?: string;
 };
 
 export type DailyWisdom = {

@@ -13,6 +13,24 @@ const HomePage = () => {
   const activeRel = useMemo(() => religions.find((r) => r.id === activeReligion)!, [activeReligion]);
   const colorVar = activeRel.colorVar;
 
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const normalizedQuery = searchQuery.toLowerCase();
+    const results: any[] = [];
+    religions.forEach(rel => {
+      rel.scriptures.forEach(scripture => {
+        if (
+          scripture.name.toLowerCase().includes(normalizedQuery) ||
+          scripture.tagline.toLowerCase().includes(normalizedQuery) ||
+          rel.name.toLowerCase().includes(normalizedQuery)
+        ) {
+          results.push({ ...scripture, relColor: rel.colorVar, relId: rel.id });
+        }
+      });
+    });
+    return results;
+  }, [searchQuery]);
+
   return (
     <div className="min-h-screen bg-background transition-colors duration-300">
       {/* Header */}
