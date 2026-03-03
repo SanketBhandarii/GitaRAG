@@ -101,81 +101,127 @@ const HomePage = () => {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 md:px-6 pb-16">
-        {/* Religion Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto py-5 scrollbar-none -mx-4 px-4 md:mx-0 md:px-0">
-          {religions.map((r) => {
-            const Icon = getFaithIcon(r.id);
-            const isActive = r.id === activeReligion;
-            return (
-              <button
-                key={r.id}
-                onClick={() => setActiveReligion(r.id)}
-                className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 ${isActive
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground/70"
-                  }`}
-              >
-                <Icon size={18} color={isActive ? `hsl(var(${r.colorVar}))` : "currentColor"} />
-                <span>{r.name}</span>
-                {isActive && (
-                  <div
-                    className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full transition-all duration-500"
-                    style={{
-                      background: `hsl(var(${r.colorVar}))`,
-                      boxShadow: `0 0 12px hsl(var(${r.colorVar}) / 0.5)`,
-                    }}
-                  />
-                )}
-              </button>
-            );
-          })}
-        </div>
+        {/* Search Results or Religion Tabs */}
+        {searchQuery.trim() ? (
+          <section className="animate-fade-in mt-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Search className="h-4 w-4 text-primary" />
+              Search Results for "{searchQuery}"
+            </h2>
+            {searchResults.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {searchResults.map((s) => (
+                  <button
+                    key={`${s.relId}-${s.id}`}
+                    onClick={() => s.available && navigate(`/chat/${s.id}`)}
+                    className="group relative text-left rounded-2xl border border-border/60 bg-card p-5 transition-all duration-300 hover:opacity-80 disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
+                      style={{ background: `hsl(var(${s.relColor}) / 0.1)` }}
+                    >
+                      {(() => {
+                        const Icon = getFaithIcon(s.relId);
+                        return <Icon size={20} color={`hsl(var(${s.relColor}))`} />;
+                      })()}
+                    </div>
+                    <h3 className="text-base font-semibold mb-1">{s.name}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-2 mb-3">{s.tagline}</p>
+                    {s.chapters && (
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground mt-auto">
+                        <span>{s.chapters} {s.unitType || 'chapters'}</span>
+                        {s.verses && <span>• {s.verses.toLocaleString()} verses</span>}
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 rounded-2xl border border-dashed border-border/60">
+                <Search className="h-10 w-10 text-muted-foreground/30 mx-auto mb-3" />
+                <p className="text-muted-foreground">No scriptures found matching your search.</p>
+              </div>
+            )}
+          </section>
+        ) : (
+          <>
+            {/* Religion Tabs */}
+            <div className="flex items-center gap-1 overflow-x-auto py-5 scrollbar-none -mx-4 px-4 md:mx-0 md:px-0">
+              {religions.map((r) => {
+                const Icon = getFaithIcon(r.id);
+                const isActive = r.id === activeReligion;
+                return (
+                  <button
+                    key={r.id}
+                    onClick={() => setActiveReligion(r.id)}
+                    className={`relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium whitespace-nowrap transition-all duration-300 ${isActive
+                      ? "text-foreground"
+                      : "text-muted-foreground hover:text-foreground/70"
+                      }`}
+                  >
+                    <Icon size={18} color={isActive ? `hsl(var(${r.colorVar}))` : "currentColor"} />
+                    <span>{r.name}</span>
+                    {isActive && (
+                      <div
+                        className="absolute bottom-0 left-2 right-2 h-[2px] rounded-full transition-all duration-500"
+                        style={{
+                          background: `hsl(var(${r.colorVar}))`,
+                          boxShadow: `0 0 12px hsl(var(${r.colorVar}) / 0.5)`,
+                        }}
+                      />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
 
-        {/* Scripture Grid */}
-        <section className="animate-fade-in" key={activeReligion}>
-          <h2 className="text-lg font-semibold mb-4">
-            {activeRel.name} Scriptures
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {activeRel.scriptures.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => s.available && navigate(`/chat/${s.id}`)}
-                disabled={!s.available}
-                className="group relative text-left rounded-2xl border border-border/60 bg-card p-5 transition-all duration-300 hover:opacity-80 disabled:opacity-70 disabled:cursor-not-allowed"
-              >
-                {/* Top icon area */}
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300"
-                  style={{
-                    background: `hsl(var(${colorVar}) / 0.1)`,
-                  }}
-                >
-                  {(() => {
-                    const Icon = getFaithIcon(activeReligion);
-                    return <Icon size={24} color={`hsl(var(${colorVar}))`} />;
-                  })()}
-                </div>
+            {/* Scripture Grid */}
+            <section className="animate-fade-in" key={activeReligion}>
+              <h2 className="text-lg font-semibold mb-4">
+                {activeRel.name} Scriptures
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {activeRel.scriptures.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => s.available && navigate(`/chat/${s.id}`)}
+                    disabled={!s.available}
+                    className="group relative text-left rounded-2xl border border-border/60 bg-card p-5 transition-all duration-300 hover:opacity-80 disabled:opacity-70 disabled:cursor-not-allowed"
+                  >
+                    {/* Top icon area */}
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300"
+                      style={{
+                        background: `hsl(var(${colorVar}) / 0.1)`,
+                      }}
+                    >
+                      {(() => {
+                        const Icon = getFaithIcon(activeReligion);
+                        return <Icon size={24} color={`hsl(var(${colorVar}))`} />;
+                      })()}
+                    </div>
 
-                <h3 className="text-base font-semibold mb-1 text-card-foreground">{s.name}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{s.tagline}</p>
+                    <h3 className="text-base font-semibold mb-1 text-card-foreground">{s.name}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{s.tagline}</p>
 
-                {s.chapters && (
-                  <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
-                    {s.chapters && <span>{s.chapters} chapters</span>}
-                    {s.verses && <span>• {s.verses.toLocaleString()} verses</span>}
-                  </div>
-                )}
+                    {s.chapters && (
+                      <div className="flex items-center gap-3 mt-3 text-xs text-muted-foreground">
+                        {s.chapters && <span>{s.chapters} {s.unitType || 'chapters'}</span>}
+                        {s.verses && <span>• {s.verses.toLocaleString()} verses</span>}
+                      </div>
+                    )}
 
-                {!s.available && (
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide uppercase glass border border-border/50 text-muted-foreground">
-                    Coming Soon
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-        </section>
+                    {!s.available && (
+                      <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-semibold tracking-wide uppercase glass border border-border/50 text-muted-foreground">
+                        Coming Soon
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
 
         {/* Daily Wisdom */}
         <section className="mt-12">
