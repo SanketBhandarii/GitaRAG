@@ -1,17 +1,20 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from typing import Optional
+import os
+import re
+import json
 from database import engine, get_db
 import models
+from auth_router import router as auth_router
+from chat_router import router as chat_router
+from query import get_ai_reply  # Moved from inside function
 
 # Create all tables on startup
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="SecularAI API")
-
-import os
 
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
 allowed_origins = [
@@ -20,6 +23,9 @@ allowed_origins = [
     "http://localhost:5174",
     "http://localhost:8080",
     "https://gitarag.vercel.app",
+    "https://gitarag.vercel.app/",
+    "https://gita-rag.vercel.app",
+    "https://gita-rag.vercel.app/",
     frontend_url,
 ]
 
@@ -31,10 +37,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-from auth_router import router as auth_router
-from chat_router import router as chat_router
 
+# Debug Middleware to log Origin and Method
+@app.middleware("http")
+async def log_cors_details(request: Request, call_next):
+    origin = request.headers.get("origin")
+    method = request.method
+    path = request.url.path
+    if origin:
+        print(f"DEBUG: Incoming {method} request to {path} from Origin: {origin}")
+
+    response = await call_next(request)
+    return response
+
+
+# Include routers
 app.include_router(auth_router)
 app.include_router(chat_router)
 
@@ -48,17 +65,18 @@ class QueryRequest(BaseModel):
 
 @app.post("/query")
 def query_scripture(request: QueryRequest, db: Session = Depends(get_db)):
-    from models import ChatMessage, ChatSession
-    import json
-
-    session = db.query(ChatSession).filter(ChatSession.id == request.session_id).first()
+    session = (
+        db.query(models.ChatSession)
+        .filter(models.ChatSession.id == request.session_id)
+        .first()
+    )
     if not session:
         return {"error": "Session not found"}
 
     past_messages = (
-        db.query(ChatMessage)
-        .filter(ChatMessage.session_id == request.session_id)
-        .order_by(ChatMessage.created_at)
+        db.query(models.ChatMessage)
+        .filter(models.ChatMessage.session_id == request.session_id)
+        .order_by(models.ChatMessage.created_at)
         .all()
     )
 
@@ -68,15 +86,13 @@ def query_scripture(request: QueryRequest, db: Session = Depends(get_db)):
         history_text += f"{role}: {msg.content}\n"
 
     # Save user message
-    user_msg = ChatMessage(
+    user_msg = models.ChatMessage(
         session_id=request.session_id, role="user", content=request.user_query
     )
     db.add(user_msg)
     db.commit()
 
     # Get reply
-    from query import get_ai_reply
-
     reply = get_ai_reply(
         request.user_query,
         history_text,
@@ -85,8 +101,6 @@ def query_scripture(request: QueryRequest, db: Session = Depends(get_db)):
     )
 
     # Basic parse of verses for the DB
-    import re
-
     verses_data = []
 
     def extract_verses(match):
@@ -100,7 +114,7 @@ def query_scripture(request: QueryRequest, db: Session = Depends(get_db)):
     ).strip()
 
     # Save AI message
-    ai_msg = ChatMessage(
+    ai_msg = models.ChatMessage(
         session_id=request.session_id,
         role="ai",
         content=reply,
