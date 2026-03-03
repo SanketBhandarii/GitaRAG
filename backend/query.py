@@ -8,6 +8,10 @@ import os
 
 load_dotenv()
 
+# Suppress HuggingFace/Mistral tokenizer warnings if no token is provided
+if not os.environ.get("HF_TOKEN"):
+    os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 # Pinecone init — wrapped so the server still starts even if key is invalid
 pc = None
 index = None
