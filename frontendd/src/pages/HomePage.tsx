@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Share2, BookOpen, Sparkles } from "lucide-react";
+import { Search, Share2, BookOpen, Sparkles, LogOut } from "lucide-react";
 import { religions, dailyWisdoms, getReligionColor } from "@/data/mockData";
 import { getFaithIcon } from "@/components/FaithIcons";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -42,15 +42,29 @@ const HomePage = () => {
           <div className="flex items-center gap-2">
             <ThemeToggle />
             {localStorage.getItem("secularai-token") ? (
-              <button
-                onClick={() => navigate("/home")}
-                className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center"
-                title={localStorage.getItem("secularai-username") || "User"}
-              >
-                <span className="text-xs font-bold text-primary">
-                  {(localStorage.getItem("secularai-username") || "U")[0].toUpperCase()}
-                </span>
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => navigate("/home")}
+                  className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center"
+                  title={localStorage.getItem("secularai-username") || "User"}
+                >
+                  <span className="text-xs font-bold text-primary">
+                    {(localStorage.getItem("secularai-username") || "U")[0].toUpperCase()}
+                  </span>
+                </button>
+                <button
+                  onClick={() => {
+                    localStorage.removeItem("secularai-token");
+                    localStorage.removeItem("secularai-username");
+                    navigate("/login");
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-all border border-red-100 dark:border-red-900/30"
+                  title="Log Out"
+                >
+                  <LogOut size={14} />
+                  <span className="hidden sm:inline">Log Out</span>
+                </button>
+              </div>
             ) : (
               <>
                 <button

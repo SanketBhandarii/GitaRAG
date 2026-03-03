@@ -5,7 +5,6 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from dotenv import load_dotenv
 from groq import Groq
 import os
-import re
 
 load_dotenv()
 
@@ -48,8 +47,8 @@ def is_harmful_query(q: str):
     return any(b in q for b in bad)
 
 
-def similarity_search(query: str, k: int = 3):
-    return vector_store.similarity_search(query, k=k)
+def similarity_search(query: str, namespace: str = None, k: int = 3):
+    return vector_store.similarity_search(query, k=k, namespace=namespace)
 
 
 def get_ai_reply(
@@ -61,8 +60,24 @@ def get_ai_reply(
     if is_harmful_query(query):
         return "I cannot guide you toward harm. But I can help you calm your mind. Tell me what you are feeling."
 
-    context_docs = similarity_search(query, k=3)
+    # Determine namespace from scripture name
+    # Mapping logic to match the filenames in ./data/
+    s_cleaned = scripture.lower()
+    namespace = "gita"  # default
+    if "bible" in s_cleaned:
+        namespace = "bible"
+    elif "quran" in s_cleaned:
+        namespace = "quran"
+    elif "torah" in s_cleaned:
+        namespace = "torah"
+    elif "dhammapada" in s_cleaned:
+        namespace = "dhammapada"
+    elif "sahib" in s_cleaned or "granth" in s_cleaned:
+        namespace = "gurugrantsahib"
+
+    context_docs = similarity_search(query, namespace=namespace, k=3)
     context = "\n\n".join([d.page_content for d in context_docs])
+    # ... (rest of the prompt remains the same)
 
     system_prompt = f"""
 You are a wise and compassionate guide representing the teachings of {scripture} from the {religion} tradition, speaking in simple modern English.

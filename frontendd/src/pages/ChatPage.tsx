@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Send, Copy, Bookmark, Volume2, Square, Menu, Plus, MessageSquare, X, Trash2, SendHorizontalIcon } from "lucide-react";
+import { ArrowLeft, Send, Copy, Bookmark, Volume2, Square, Menu, Plus, MessageSquare, X, Trash2, SendHorizontalIcon, LogOut, Check } from "lucide-react";
 import { getScripture, getReligionByScriptureId, type ChatMessage } from "@/data/mockData";
 import { getFaithIcon } from "@/components/FaithIcons";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -61,6 +61,7 @@ const ChatPage = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   // Dashboard state
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -117,13 +118,16 @@ const ChatPage = () => {
       });
       if (res.ok) {
         const data = await res.json();
-        const formatted = data.map((m: any) => ({
-          id: m.id.toString(),
-          role: m.role,
-          content: m.content,
-          verses: m.verses || undefined,
-          sentiment: m.sentiment || undefined
-        }));
+        const formatted = data.map((m: any) => {
+          const { cleanText, verses } = parseVerses(m.content);
+          return {
+            id: m.id.toString(),
+            role: m.role,
+            content: cleanText,
+            verses: verses.length > 0 ? verses : (m.verses || undefined),
+            sentiment: m.sentiment || undefined
+          };
+        });
         setMessages(formatted);
       }
     } catch (e) {
@@ -337,14 +341,28 @@ const ChatPage = () => {
 
           {/* User Profile Area */}
           <div className="p-4 border-t border-border/50">
-            <div className="flex items-center gap-3 px-1">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">
-                {(localStorage.getItem("secularai-username") || "U")[0].toUpperCase()}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-3 px-1">
+                <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm">
+                  {(localStorage.getItem("secularai-username") || "U")[0].toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-foreground truncate">{localStorage.getItem("secularai-username") || "User"}</p>
+                </div>
+                <ThemeToggle />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-foreground truncate">{localStorage.getItem("secularai-username") || "User"}</p>
-              </div>
-              <ThemeToggle />
+
+              <button
+                onClick={() => {
+                  localStorage.removeItem("secularai-token");
+                  localStorage.removeItem("secularai-username");
+                  navigate("/login");
+                }}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-all "
+              >
+                <LogOut size={16} />
+                <span>Log Out</span>
+              </button>
             </div>
           </div>
         </div>
@@ -449,17 +467,28 @@ const ChatPage = () => {
                                     <Volume2 className="h-4 w-4" />
                                   </button>
                                   <button
-                                    className="p-1.5 rounded-md hover:bg-secondary/80 transition-colors text-muted-foreground hover:text-foreground"
-                                    onClick={() => navigator.clipboard.writeText(v.text)}
+                                    className={`p-1.5 rounded-md transition-all ${copiedId === `${msg.id}-${i}` ? "text-green-500 bg-green-500/10" : "hover:bg-secondary/80 text-muted-foreground hover:text-foreground"}`}
+                                    onClick={() => {
+                                      navigator.clipboard.writeText(v.text);
+                                      setCopiedId(`${msg.id}-${i}`);
+                                      setTimeout(() => setCopiedId(null), 2000);
+                                    }}
                                   >
-                                    <Copy className="h-4 w-4" />
+                                    {copiedId === `${msg.id}-${i}` ? (
+                                      <div className="flex items-center gap-1.5">
+                                        <span className="text-[10px] font-bold">COPIED</span>
+                                        <Check className="h-3.5 w-3.5" />
+                                      </div>
+                                    ) : (
+                                      <Copy className="h-4 w-4" />
+                                    )}
                                   </button>
                                   <button className="p-1.5 rounded-md hover:bg-secondary/80 transition-colors text-muted-foreground hover:text-foreground">
                                     <Bookmark className="h-4 w-4" />
                                   </button>
                                 </div>
                               </div>
-                              <p className="font-serif text-[15px] italic leading-relaxed text-foreground/90">
+                              <p className="font-serif text-[15px] leading-relaxed text-foreground/90">
                                 "{v.text}"
                               </p>
                             </div>
@@ -483,10 +512,10 @@ const ChatPage = () => {
 
                       <div className="pl-9 w-full">
                         <div className="space-y-3 w-full max-w-2xl">
-                          <div className="h-4 bg-secondary/80 rounded-md w-full animate-pulse"></div>
-                          <div className="h-4 bg-secondary/80 rounded-md w-[90%] animate-pulse"></div>
-                          <div className="h-4 bg-secondary/80 rounded-md w-[95%] animate-pulse"></div>
-                          <div className="h-4 bg-secondary/80 rounded-md w-[70%] animate-pulse"></div>
+                          <div className="h-4 shimmer rounded-md w-full"></div>
+                          <div className="h-4 shimmer rounded-md w-full"></div>
+                          <div className="h-4 shimmer rounded-md w-full"></div>
+                          <div className="h-4 shimmer rounded-md w-[85%]"></div>
                         </div>
                       </div>
                     </div>
