@@ -26,6 +26,8 @@ allowed_origins = [
     "https://gitarag.vercel.app/",
     "https://gita-rag.vercel.app",
     "https://gita-rag.vercel.app/",
+    "https://secularai.vercel.app",
+    "https://secularai.vercel.app/",
     frontend_url,
 ]
 
