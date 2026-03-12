@@ -226,9 +226,41 @@
   0%,
   100% {
     box-shadow: 0 0 20px hsl(var(--primary) / 0.25);
+    transform: scale(1);
   }
   50% {
     box-shadow: 0 0 50px hsl(var(--primary) / 0.5);
+    transform: scale(1.05);
+  }
+}
+
+@keyframes orbit-slow {
+  from {
+    transform: rotate(0deg) translateX(var(--orbit-radius)) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(var(--orbit-radius)) rotate(-360deg);
+  }
+}
+
+@keyframes spin-very-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes star-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
   }
 }
 
@@ -266,6 +298,14 @@
 
 .animate-fade-in {
   animation: fade-in 0.4s ease-out forwards;
+}
+
+.animate-spin-very-slow {
+  animation: spin-very-slow 60s linear infinite;
+}
+
+.animate-star-pulse {
+  animation: star-pulse 4s ease-in-out infinite;
 }
 
 /* Scrollbar styling */

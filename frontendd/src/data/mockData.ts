@@ -1,6 +1,7 @@
 export type Religion = {
   id: string;
   name: string;
+  logo: string;
   colorVar: string;
   scriptures: Scripture[];
 };
@@ -42,6 +43,7 @@ export const religions: Religion[] = [
   {
     id: "buddhism",
     name: "Buddhism",
+    logo: "/dlogo.webp",
     colorVar: "--buddhism",
     scriptures: [
       { id: "dhammapada", name: "Dhammapada", tagline: "The path of truth — core teachings of the Buddha", religionId: "buddhism", available: true, chapters: 26, verses: 423, unitType: "chapters" },
@@ -50,6 +52,7 @@ export const religions: Religion[] = [
   {
     id: "hinduism",
     name: "Hinduism",
+    logo: "/glogo.jpg",
     colorVar: "--hindu",
     scriptures: [
       { id: "bhagavad-gita", name: "Bhagavad Gita", tagline: "The Song of the Divine — 700 verses of timeless wisdom", religionId: "hinduism", available: true, chapters: 18, verses: 700, unitType: "chapters" },
@@ -58,6 +61,7 @@ export const religions: Religion[] = [
   {
     id: "judaism",
     name: "Judaism",
+    logo: "/jlogo.svg",
     colorVar: "--judaism",
     scriptures: [
       { id: "torah", name: "Torah", tagline: "The five books of Moses — foundation of Jewish law", religionId: "judaism", available: true, chapters: 187, verses: 5845, unitType: "chapters" },
@@ -66,6 +70,7 @@ export const religions: Religion[] = [
   {
     id: "sikhism",
     name: "Sikhism",
+    logo: "/slogo.svg",
     colorVar: "--sikhism",
     scriptures: [
       { id: "guru-granth-sahib", name: "Guru Granth Sahib", tagline: "The eternal Guru — divine poetry across 1430 Angs", religionId: "sikhism", available: true, chapters: 31, verses: 1430, unitType: "angs" },
@@ -74,6 +79,7 @@ export const religions: Religion[] = [
   {
     id: "christianity",
     name: "Christianity",
+    logo: "/clogo.webp",
     colorVar: "--christianity",
     scriptures: [
       { id: "bible", name: "Bible", tagline: "The word of God — Old and New Testament combined", religionId: "christianity", available: true, chapters: 1189, verses: 31102, unitType: "chapters" },
@@ -82,6 +88,7 @@ export const religions: Religion[] = [
   {
     id: "islam",
     name: "Islam",
+    logo: "/ilogo.jpg",
     colorVar: "--islam",
     scriptures: [
       { id: "quran", name: "Quran", tagline: "The final revelation — guidance for all of humanity", religionId: "islam", available: true, chapters: 114, verses: 6236, unitType: "surahs" },

@@ -1,171 +1,443 @@
-import { useState, useEffect, useCallback } from "react";
+"use client";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getFaithIcon } from "@/components/FaithIcons";
-import { religions } from "@/data/mockData";
 
-const PARTICLE_COUNT = 50;
-
-const particles = Array.from({ length: PARTICLE_COUNT }, (_, i) => ({
+const PARTICLES = Array.from({ length: 80 }, (_, i) => ({
   id: i,
-  left: Math.random() * 100,
-  top: Math.random() * 100,
-  size: Math.random() * 2.5 + 0.8,
-  duration: Math.random() * 8 + 6,
-  delay: Math.random() * 5,
-  dx: (Math.random() - 0.5) * 200,
-  dy: (Math.random() - 0.5) * 200,
+  x: Math.random() * 100,
+  y: Math.random() * 100,
+  size: Math.random() * 2 + 0.4,
+  duration: Math.random() * 8 + 4,
+  delay: Math.random() * 6,
+  opacity: Math.random() * 0.5 + 0.1,
 }));
 
-// Orbit duration — 5s per religion so they fly around fast
-const ORBIT_DURATION = 5;
+const SCRIPTURES = [
+  {
+    name: "Bhagavad Gita",
+    symbol: "ॐ",
+    logo: "/glogo.jpg",
+    color: "#F59E0B",
+    colorClass: "text-amber-400",
+    bgClass: "bg-amber-400/10",
+    borderClass: "border-amber-400/30",
+    glowClass: "shadow-amber-400/20",
+    religion: "Hinduism",
+    established: "~ 400 BCE",
+    origin: "Ancient India",
+    fact: "700 verses across 18 chapters, part of the Mahabharata. One of the most studied philosophical texts in human history.",
+  },
+  {
+    name: "The Bible",
+    symbol: "✝",
+    logo: "/clogo.webp",
+    color: "#60A5FA",
+    colorClass: "text-blue-400",
+    bgClass: "bg-blue-400/10",
+    borderClass: "border-blue-400/30",
+    glowClass: "shadow-blue-400/20",
+    religion: "Christianity",
+    established: "~ 1st Century CE",
+    origin: "Middle East",
+    fact: "66 books written over 1500 years by 40 authors. The most printed and translated book in history.",
+  },
+  {
+    name: "The Quran",
+    symbol: "☪",
+    logo: "/ilogo.jpg",
+    color: "#34D399",
+    colorClass: "text-emerald-400",
+    bgClass: "bg-emerald-400/10",
+    borderClass: "border-emerald-400/30",
+    glowClass: "shadow-emerald-400/20",
+    religion: "Islam",
+    established: "~ 610 CE",
+    origin: "Arabia",
+    fact: "114 chapters revealed over 23 years. Memorised verbatim by millions of people worldwide.",
+  },
+  {
+    name: "Dhammapada",
+    symbol: "☸",
+    logo: "/dlogo.webp",
+    color: "#C084FC",
+    colorClass: "text-purple-400",
+    bgClass: "bg-purple-400/10",
+    borderClass: "border-purple-400/30",
+    glowClass: "shadow-purple-400/20",
+    religion: "Buddhism",
+    established: "~ 563 BCE",
+    origin: "Ancient India / Nepal",
+    fact: "423 verses directly attributed to the Buddha. A practical guide to reducing suffering and living with clarity.",
+  },
+  {
+    name: "Guru Granth Sahib",
+    symbol: "ੴ",
+    logo: "/slogo.svg",
+    color: "#FB923C",
+    colorClass: "text-orange-400",
+    bgClass: "bg-orange-400/10",
+    borderClass: "border-orange-400/30",
+    glowClass: "shadow-orange-400/20",
+    religion: "Sikhism",
+    established: "~ 1469 CE",
+    origin: "Punjab, India",
+    fact: "Hymns from 36 contributors across different faiths and castes. Recognised as the living, eternal Guru.",
+  },
+  {
+    name: "Torah",
+    symbol: "✡",
+    logo: "/jlogo.svg",
+    color: "#38BDF8",
+    colorClass: "text-sky-400",
+    bgClass: "bg-sky-400/10",
+    borderClass: "border-sky-400/30",
+    glowClass: "shadow-sky-400/20",
+    religion: "Judaism",
+    established: "~ 1300 BCE",
+    origin: "Ancient Israel",
+    fact: "The five books of Moses that form the foundation of Jewish law, ethics, and identity.",
+  },
+];
 
-const orbitItems = religions.map((r, i) => ({
-  religionId: r.id,
-  // Stagger start: each icon offset equally around the circle
-  delay: -i * (ORBIT_DURATION / religions.length),
-}));
-
-const SplashScreen = () => {
-  const navigate = useNavigate();
-  const [fadeOut, setFadeOut] = useState(false);
+export default function SplashScreen() {
   const [mounted, setMounted] = useState(false);
+  const [active, setActive] = useState(0);
+  const [infoVisible, setInfoVisible] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const navigate = useNavigate();
+
+  useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    setMounted(true);
+    const t = setInterval(() => {
+      setInfoVisible(false);
+      setTimeout(() => {
+        setActive((p) => (p + 1) % SCRIPTURES.length);
+        setInfoVisible(true);
+      }, 500);
+    }, 4000);
+    return () => clearInterval(t);
   }, []);
 
-  const handleBegin = useCallback(() => {
-    setFadeOut(true);
-    setTimeout(() => navigate("/home"), 600);
-  }, [navigate]);
+  const handlePillClick = (i) => {
+    if (i === active) return;
+    setInfoVisible(false);
+    setTimeout(() => { setActive(i); setInfoVisible(true); }, 300);
+  };
 
-  const handleSkip = useCallback(() => {
-    navigate("/home");
-  }, [navigate]);
+  const s = SCRIPTURES[active];
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex flex-col items-center justify-center overflow-hidden transition-opacity duration-600 ${fadeOut ? "opacity-0 pointer-events-none" : "opacity-100"
-        }`}
-      style={{
-        background: "linear-gradient(180deg, hsl(220 22% 5%) 0%, hsl(215 25% 7%) 50%, hsl(220 22% 5%) 100%)",
-      }}
-    >
-      {/* Sky-blue particles */}
-      {particles.map((p) => (
+    <div className="min-h-screen dark bg-background text-foreground font-sans overflow-x-hidden relative flex flex-col transition-colors duration-1000">
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        @keyframes twinkle {
+          0%, 100% { opacity: 0.07; transform: scale(1); }
+          50% { opacity: 0.65; transform: scale(1.5); }
+        }
+        @keyframes blob1 {
+          0%, 100% { transform: translate(0,0) scale(1); }
+          50% { transform: translate(4%, -5%) scale(1.1); }
+        }
+        @keyframes blob2 {
+          0%, 100% { transform: translate(0,0) scale(1); }
+          50% { transform: translate(-3%, 4%) scale(1.06); }
+        }
+        @keyframes fadeDown {
+          from { opacity: 0; transform: translateY(-16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeUp0 { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .anim-nav { animation: fadeDown 0.7s ease forwards; opacity: 0; }
+        .anim-1 { animation: fadeUp0 0.8s ease 0.1s forwards; opacity: 0; }
+        .anim-2 { animation: fadeUp0 0.8s ease 0.25s forwards; opacity: 0; }
+        .anim-3 { animation: fadeUp0 0.8s ease 0.4s forwards; opacity: 0; }
+        .anim-4 { animation: fadeUp0 0.8s ease 0.55s forwards; opacity: 0; }
+        .anim-5 { animation: fadeUp0 0.8s ease 0.7s forwards; opacity: 0; }
+        .anim-6 { animation: fadeUp0 0.8s ease 0.9s forwards; opacity: 0; }
+        .anim-7 { animation: fadeUp0 0.8s ease 1.1s forwards; opacity: 0; }
+        .mobile-menu { animation: slideInRight 0.25s ease forwards; }
+        .pill-btn:hover { border-color: rgba(255,255,255,0.2) !important; color: rgba(255,255,255,0.7) !important; }
+        .nav-link:hover { color: rgba(255,255,255,0.88) !important; }
+        .cta-ghost:hover { background: rgba(255,255,255,0.07) !important; color: rgba(255,255,255,0.85) !important; }
+        .cta-main:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .cta-main { transition: all 0.25s ease; }
+        .pills-scroll { scrollbar-width: none; -ms-overflow-style: none; }
+        .pills-scroll::-webkit-scrollbar { display: none; }
+      `}</style>
+
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div
-          key={p.id}
           className="absolute rounded-full"
           style={{
-            left: `${p.left}%`,
-            top: `${p.top}%`,
-            width: p.size,
-            height: p.size,
-            background: `radial-gradient(circle, hsl(200 85% 70% / 0.7), transparent)`,
-            animation: `particle-drift ${p.duration}s ease-in-out ${p.delay}s infinite`,
-            "--dx": `${p.dx}px`,
-            "--dy": `${p.dy}px`,
-          } as React.CSSProperties}
+            top: "-20%", left: "-15%",
+            width: "60%", height: "60%",
+            background: `radial-gradient(circle, ${s.color}18 0%, transparent 70%)`,
+            transition: "background 1.4s ease",
+            animation: "blob1 14s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute rounded-full"
+          style={{
+            bottom: "-20%", right: "-15%",
+            width: "65%", height: "65%",
+            background: `radial-gradient(circle, ${s.color}10 0%, transparent 70%)`,
+            transition: "background 1.4s ease",
+            animation: "blob2 18s ease-in-out infinite",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px)`,
+            backgroundSize: "72px 72px",
+          }}
+        />
+      </div>
+
+      {mounted && PARTICLES.map((p) => (
+        <div
+          key={p.id}
+          className="absolute rounded-full bg-white pointer-events-none"
+          style={{
+            left: `${p.x}%`, top: `${p.y}%`,
+            width: `${p.size}px`, height: `${p.size}px`,
+            opacity: p.opacity,
+            animation: `twinkle ${p.duration}s ease-in-out infinite ${p.delay}s`,
+          }}
         />
       ))}
 
-      {/* Central glow — sky blue */}
-      <div
-        className="absolute w-[280px] h-[280px] md:w-[380px] md:h-[380px] rounded-full"
-        style={{
-          background: "radial-gradient(circle, hsl(200 85% 55% / 0.12) 0%, transparent 70%)",
-          filter: "blur(40px)",
-        }}
-      />
+      <nav className={`relative z-20 flex justify-between items-center px-5 sm:px-14 py-5 border-b border-white/5 ${mounted ? "anim-nav" : "opacity-0"}`}>
+        <div className="flex items-center gap-3">
+          <span className="text-[20px] font-bold tracking-tight text-foreground/90">
+            Secular<span style={{ color: s.color, transition: "color 0.8s" }}>AI</span>
+          </span>
+        </div>
 
-      {/* Orbit ring */}
-      <div
-        className={`relative w-[240px] h-[240px] md:w-[320px] md:h-[320px] mb-10 transition-all duration-800 ${mounted ? "scale-100 opacity-100" : "scale-75 opacity-0"
-          }`}
-      >
-        {/* Center orb — blackish with sky blue glow */}
-        <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 md:w-18 md:h-18 rounded-full animate-pulse-glow"
-          style={{
-            background: "radial-gradient(circle, hsl(200 80% 55%) 0%, hsl(210 70% 30%) 100%)",
-            width: "3.5rem",
-            height: "3.5rem",
-          }}
-        />
-
-        {/* Orbit circle outline — subtle sky blue */}
-        <div
-          className="absolute inset-0 rounded-full"
-          style={{ border: "1px solid hsl(200 60% 50% / 0.2)" }}
-        />
-
-        {/* Orbiting icons — fast */}
-        {orbitItems.map((item) => {
-          const Icon = getFaithIcon(item.religionId);
-          return (
-            <div
-              key={item.religionId}
-              className="absolute top-1/2 left-1/2 w-0 h-0"
-              style={{
-                animation: `orbit ${ORBIT_DURATION}s linear ${item.delay}s infinite`,
-                "--orbit-radius": "clamp(110px, 14vw, 148px)",
-              } as React.CSSProperties}
+        <div className="hidden md:flex gap-8 items-center">
+          {["Features", "Scriptures", "About"].map((item) => (
+            <a
+              key={item}
+              href="#"
+              className="nav-link text-[13px] font-medium tracking-wide text-muted-foreground no-underline transition-colors duration-200"
             >
-              <div
-                className="flex items-center justify-center w-9 h-9 md:w-11 md:h-11 rounded-full -translate-x-1/2 -translate-y-1/2"
-                style={{
-                  background: "hsl(220 20% 8% / 0.85)",
-                  border: "1px solid hsl(200 50% 40% / 0.35)",
-                  backdropFilter: "blur(8px)",
-                }}
-              >
-                <Icon size={17} color="hsl(200, 80%, 68%)" />
-              </div>
-            </div>
-          );
-        })}
-      </div>
+              {item}
+            </a>
+          ))}
+          <button
+            onClick={() => navigate("/login")}
+            className="px-5 py-2 rounded-lg text-[13px] font-medium tracking-wide border transition-all duration-700 cursor-pointer"
+            style={{
+              background: `${s.color}12`,
+              borderColor: `${s.color}35`,
+              color: s.color,
+              transition: "all 0.8s ease",
+            }}
+          >
+            Sign In
+          </button>
+        </div>
 
-      {/* Text + buttons */}
-      <div
-        className={`flex flex-col items-center text-center px-6 transition-all duration-800 delay-200 ${mounted ? "translate-y-0 opacity-100" : "translate-y-8 opacity-0"
-          }`}
-      >
-        <h1
-          className="text-4xl md:text-5xl font-bold tracking-tight mb-3"
-          style={{ color: "hsl(210 20% 94%)" }}
+        <button
+          className="md:hidden flex flex-col justify-center gap-[5px] w-8 h-8 bg-transparent border-0 cursor-pointer z-50"
+          onClick={() => setMenuOpen(!menuOpen)}
         >
-          Secular<span style={{ color: "hsl(200, 85%, 62%)" }}>AI</span>
-        </h1>
-        <p
-          className="text-base md:text-lg mb-8 max-w-sm"
-          style={{ color: "hsl(210 15% 60%)" }}
-        >
-          Explore the wisdom of all traditions
+          <span
+            className="block w-5 h-[1.5px] bg-white/60 transition-all duration-300 origin-center"
+            style={{ transform: menuOpen ? "rotate(45deg) translate(4px, 4px)" : "none" }}
+          />
+          <span
+            className="block w-5 h-[1.5px] bg-white/60 transition-all duration-300"
+            style={{ opacity: menuOpen ? 0 : 1 }}
+          />
+          <span
+            className="block w-5 h-[1.5px] bg-white/60 transition-all duration-300 origin-center"
+            style={{ transform: menuOpen ? "rotate(-45deg) translate(4px, -4px)" : "none" }}
+          />
+        </button>
+      </nav>
+
+      {menuOpen && (
+        <>
+          <div
+            className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
+            onClick={() => setMenuOpen(false)}
+          />
+          <div
+            className="mobile-menu fixed top-0 right-0 h-full w-[260px] z-40 md:hidden flex flex-col pt-20 pb-8 px-7 gap-6 border-l border-white/8"
+            style={{ background: "rgba(8,7,14,0.97)", backdropFilter: "blur(24px)" }}
+          >
+            <button
+              className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-white/5 border border-white/10 rounded-lg text-white/50 cursor-pointer text-lg"
+              onClick={() => setMenuOpen(false)}
+            >
+              ✕
+            </button>
+            <span className="text-[18px] font-bold tracking-tight text-foreground/90 mb-2">
+              Secular<span style={{ color: s.color }}>AI</span>
+            </span>
+            {["Features", "Scriptures", "About"].map((item) => (
+              <a
+                key={item}
+                href="#"
+                className="text-[15px] font-medium text-white/40 no-underline hover:text-white/80 transition-colors"
+                onClick={() => setMenuOpen(false)}
+              >
+                {item}
+              </a>
+            ))}
+            <button
+              onClick={() => { setMenuOpen(false); navigate("/login"); }}
+              className="mt-2 px-5 py-2.5 rounded-lg text-[13px] font-medium tracking-wide border cursor-pointer w-fit"
+              style={{
+                background: `${s.color}15`,
+                borderColor: `${s.color}40`,
+                color: s.color,
+              }}
+            >
+              Sign In
+            </button>
+          </div>
+        </>
+      )}
+
+      <main className="flex-1 relative z-10 flex flex-col items-center justify-center px-5 sm:px-6 pt-12 pb-6 text-center">
+
+        <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-9 border border-white/8 bg-white/[0.03] ${mounted ? "anim-1" : "opacity-0"}`}>
+          <span className="text-[11px] text-muted-foreground tracking-widest font-medium uppercase">
+            Books from different religions
+          </span>
+        </div>
+
+        <div className={`mb-5 ${mounted ? "anim-2" : "opacity-0"}`}>
+          <h1 className="text-[clamp(36px,7.5vw,76px)] font-extrabold leading-[1.06] text-foreground tracking-[-0.03em] mb-1">
+            What does your
+          </h1>
+          <h1 className="text-[clamp(36px,7.5vw,70px)] font-light leading-[1.06] text-gray-400 tracking-[-0.03em]">
+            scripture actually say?
+          </h1>
+        </div>
+
+        <p className={`text-[15px] sm:text-[18px] text-muted-foreground/80 max-w-[440px] leading-[1.4] mb-11 font-normal ${mounted ? "anim-3" : "opacity-0"}`}>
+          Your scripture has an answer for almost everything. Finding it made easy for you
         </p>
 
-        <button
-          onClick={handleBegin}
-          className="px-8 py-3.5 rounded-full text-sm font-semibold tracking-wide transition-all duration-200 hover:scale-105"
+        <div className={`flex gap-3 mb-14 ${mounted ? "anim-4" : "opacity-0"}`}>
+          <button
+            className="cta-main px-7 py-3 rounded-xl text-[15px] font-semibold tracking-wide cursor-pointer border-0"
+            style={{
+              background: s.color,
+              color: "#05040e",
+              boxShadow: `0 0 26px ${s.color}45, 0 4px 18px rgba(0,0,0,0.4)`,
+              transition: "background 0.8s ease, box-shadow 0.8s ease",
+            }}
+            onClick={() => navigate("/home")}
+          >
+            Start interaction
+          </button>
+        </div>
+
+        <div className={`w-full max-w-[600px] mb-11 ${mounted ? "anim-5" : "opacity-0"}`}>
+          <div className="pills-scroll flex gap-2 overflow-x-auto sm:flex-wrap sm:justify-center px-2 sm:px-5 pb-1">
+            {SCRIPTURES.map((sc, i) => (
+              <button
+                key={sc.name}
+                className="pill-btn flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium tracking-wide cursor-pointer transition-all duration-300 whitespace-nowrap border flex-shrink-0"
+                onClick={() => handlePillClick(i)}
+                style={{
+                  background: active === i ? `${sc.color}12` : "rgba(255,255,255,0.025)",
+                  borderColor: active === i ? `${sc.color}45` : "rgba(255,255,255,0.07)",
+                  color: active === i ? sc.color : "rgba(255,255,255,0.28)",
+                  boxShadow: active === i ? `0 0 12px ${sc.color}18` : "none",
+                  fontWeight: active === i ? "600" : "400",
+                }}
+              >
+                <img src={sc.logo} alt={sc.name} className="w-4 h-4 object-cover rounded-full flex-shrink-0" />
+                {sc.name}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div
+          className={`max-w-[500px] w-full rounded-2xl border p-5 sm:p-6 backdrop-blur-xl ${mounted ? "anim-6" : "opacity-0"}`}
           style={{
-            background: "linear-gradient(135deg, hsl(200, 85%, 45%), hsl(210, 80%, 55%))",
-            color: "white",
-            boxShadow: "0 0 30px hsl(200 85% 50% / 0.3)",
+            background: "rgba(255,255,255,0.022)",
+            borderColor: `${s.color}18`,
+            opacity: infoVisible ? 1 : 0,
+            transform: infoVisible ? "translateY(0)" : "translateY(10px)",
+            transition: "opacity 0.45s ease, transform 0.45s ease, border-color 0.8s ease",
           }}
         >
-          Begin Your Journey
-        </button>
+          <div className="flex items-center gap-3 mb-4">
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center text-[17px] border transition-all duration-700 flex-shrink-0"
+              style={{ background: `${s.color}14`, borderColor: `${s.color}28` }}
+            >
+              <img src={s.logo} alt={s.name} className="w-6 h-6 object-cover rounded-full flex-shrink-0" />
+            </div>
+            <div className="text-left min-w-0">
+              <div className="text-[13.5px] font-semibold text-foreground/90 truncate">{s.name}</div>
+              <div
+                className="text-[11px] font-medium tracking-widest mt-0.5 uppercase transition-colors duration-700"
+                style={{ color: s.color }}
+              >
+                {s.religion}
+              </div>
+            </div>
+            <div className="ml-auto text-right flex-shrink-0">
+              <div className="text-[10px] text-white/18 tracking-widest uppercase mb-1">Established</div>
+              <div className="text-[13px] font-semibold text-foreground/50">{s.established}</div>
+            </div>
+          </div>
 
-        <button
-          onClick={handleSkip}
-          className="mt-5 text-sm transition-colors duration-150 hover:opacity-70"
-          style={{ color: "hsl(210 15% 48%)" }}
-        >
-          Skip
-        </button>
+          <div
+            className="h-px mb-4"
+            style={{ background: `linear-gradient(90deg, transparent, ${s.color}18, transparent)`, transition: "all 0.8s" }}
+          />
+
+          <p className="text-[12.5px] text-muted-foreground leading-[1.85] text-left mb-3 font-normal">
+            {s.fact}
+          </p>
+
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] text-white/18 tracking-widest uppercase">Origin</span>
+            <span className="text-[12px] text-muted-foreground font-medium">{s.origin}</span>
+          </div>
+        </div>
+
+      </main>
+
+      <div className={`relative z-10 border-t border-white/[0.045] py-5 px-5 sm:px-14 flex justify-center gap-8 sm:gap-20 flex-wrap ${mounted ? "anim-7" : "opacity-0"}`}>
+        {[
+          { label: "Scriptures", value: "6" },
+          { label: "Verses Indexed", value: "50,000+" },
+          { label: "Religions", value: "6" },
+          { label: "Free to Use", value: "Always" },
+        ].map((stat) => (
+          <div key={stat.label} className="text-center">
+            <div
+              className="text-[18px] font-bold transition-colors duration-700"
+              style={{ color: s.color }}
+            >
+              {stat.value}
+            </div>
+            <div className="text-[10.5px] text-muted-foreground tracking-widest uppercase mt-1 font-medium">
+              {stat.label}
+            </div>
+          </div>
+        ))}
       </div>
+
     </div>
   );
-};
-
-export default SplashScreen;
+}

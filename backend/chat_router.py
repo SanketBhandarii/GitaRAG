@@ -7,7 +7,7 @@ from models import ChatSession, ChatMessage, User
 from auth_router import oauth2_scheme
 from jose import jwt, JWTError
 from auth_utils import SECRET_KEY, ALGORITHM
-from typing import List, Optional
+from typing import Optional
 from pydantic import BaseModel
 import json
 
@@ -121,7 +121,6 @@ def get_messages(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    # Verify ownership
     session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
@@ -154,17 +153,14 @@ def delete_session(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
-    # Verify ownership
     session = db.query(ChatSession).filter(ChatSession.id == session_id).first()
     if not session:
         raise HTTPException(status_code=404, detail="Session not found")
     if session.user_id != current_user.id:
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    # Delete associated messages
     db.query(ChatMessage).filter(ChatMessage.session_id == session_id).delete()
 
-    # Delete session
     db.delete(session)
     db.commit()
 

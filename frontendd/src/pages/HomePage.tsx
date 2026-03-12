@@ -32,18 +32,16 @@ const HomePage = () => {
   }, [searchQuery]);
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
-      {/* Header */}
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
       <header className="sticky top-0 z-40 glass border-b border-border/50">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3 md:px-6">
           <button
             onClick={() => navigate("/")}
             className="text-xl font-bold tracking-tight hover:opacity-80 transition-opacity duration-150 cursor-pointer"
           >
-            Secular<span className="text-primary">AI</span>
+            Secular<span className="">AI</span>
           </button>
 
-          {/* Search bar - hidden on mobile, shown md+ */}
           <div className="hidden md:flex items-center flex-1 max-w-md mx-8">
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -103,7 +101,6 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Mobile search */}
         <div className="md:hidden px-4 pb-3">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -119,7 +116,6 @@ const HomePage = () => {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 md:px-6 pb-16">
-        {/* Search Results or Religion Tabs */}
         {searchQuery.trim() ? (
           <section className="animate-fade-in mt-6">
             <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
@@ -139,8 +135,8 @@ const HomePage = () => {
                       style={{ background: `hsl(var(${s.relColor}) / 0.1)` }}
                     >
                       {(() => {
-                        const Icon = getFaithIcon(s.relId);
-                        return <Icon size={20} color={`hsl(var(${s.relColor}))`} />;
+                        const rel = religions.find(r => r.id === s.relId);
+                        return <img src={rel?.logo} alt={s.name} className="w-6 h-6 object-cover rounded-full flex-shrink-0" />;
                       })()}
                     </div>
                     <h3 className="text-base font-semibold mb-1">{s.name}</h3>
@@ -163,10 +159,8 @@ const HomePage = () => {
           </section>
         ) : (
           <>
-            {/* Religion Tabs */}
             <div className="flex items-center gap-1 overflow-x-auto py-5 scrollbar-none -mx-4 px-4 md:mx-0 md:px-0">
               {religions.map((r) => {
-                const Icon = getFaithIcon(r.id);
                 const isActive = r.id === activeReligion;
                 return (
                   <button
@@ -177,7 +171,7 @@ const HomePage = () => {
                       : "text-muted-foreground hover:text-foreground/70"
                       }`}
                   >
-                    <Icon size={18} color={isActive ? `hsl(var(${r.colorVar}))` : "currentColor"} />
+                    <img src={r.logo} alt={r.name} className={`w-5 h-5 object-cover rounded-full flex-shrink-0 ${isActive ? "" : "opacity-40"}`} />
                     <span>{r.name}</span>
                     {isActive && (
                       <div
@@ -193,7 +187,6 @@ const HomePage = () => {
               })}
             </div>
 
-            {/* Scripture Grid */}
             <section className="animate-fade-in" key={activeReligion}>
               <h2 className="text-lg font-semibold mb-4">
                 {activeRel.name} Scriptures
@@ -206,17 +199,13 @@ const HomePage = () => {
                     disabled={!s.available}
                     className="group relative text-left rounded-2xl border border-border/60 bg-card p-5 transition-all duration-300 hover:opacity-80 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
-                    {/* Top icon area */}
                     <div
                       className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-colors duration-300"
                       style={{
                         background: `hsl(var(${colorVar}) / 0.1)`,
                       }}
                     >
-                      {(() => {
-                        const Icon = getFaithIcon(activeReligion);
-                        return <Icon size={24} color={`hsl(var(${colorVar}))`} />;
-                      })()}
+                      <img src={activeRel.logo} alt={activeRel.name} className="w-8 h-8 object-cover rounded-full flex-shrink-0" />
                     </div>
 
                     <h3 className="text-base font-semibold mb-1 text-card-foreground">{s.name}</h3>
@@ -241,7 +230,6 @@ const HomePage = () => {
           </>
         )}
 
-        {/* Daily Wisdom */}
         <section className="mt-12">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="h-5 w-5 text-primary" />

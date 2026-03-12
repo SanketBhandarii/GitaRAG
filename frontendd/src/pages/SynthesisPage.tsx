@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Bookmark, Share2, Play, Pause } from "lucide-react";
 import { religions } from "@/data/mockData";
-import { getFaithIcon } from "@/components/FaithIcons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const leftPanel = {
@@ -40,8 +39,6 @@ const SynthesisPage = () => {
   const [rightAnswer, setRightAnswer] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const LeftIcon = getFaithIcon(leftPanel.religionId);
-  const RightIcon = getFaithIcon(rightPanel.religionId);
   const leftRel = religions.find((r) => r.id === leftPanel.religionId)!;
   const rightRel = religions.find((r) => r.id === rightPanel.religionId)!;
 
@@ -88,7 +85,6 @@ const SynthesisPage = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col transition-colors duration-300">
-      {/* Header */}
       <header className="sticky top-0 z-40 glass border-b border-border/50">
         <div className="max-w-6xl mx-auto flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
@@ -101,18 +97,16 @@ const SynthesisPage = () => {
         </div>
       </header>
 
-      {/* Panels */}
       <div className="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 py-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {[
-            { data: leftPanel, Icon: LeftIcon, rel: leftRel, answer: leftAnswer },
-            { data: rightPanel, Icon: RightIcon, rel: rightRel, answer: rightAnswer },
-          ].map(({ data, Icon, rel, answer }, idx) => (
+            { data: leftPanel, rel: leftRel, answer: leftAnswer },
+            { data: rightPanel, rel: rightRel, answer: rightAnswer },
+          ].map(({ data, rel, answer }, idx) => (
             <div key={idx} className="space-y-4">
-              {/* Religion label */}
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `hsl(var(${rel.colorVar}) / 0.15)` }}>
-                  <Icon size={16} color={`hsl(var(${rel.colorVar}))`} />
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-white/[0.03] border border-white/[0.08]">
+                  <img src={rel.logo} alt={rel.name} className="w-5 h-5 object-cover rounded-full flex-shrink-0" />
                 </div>
                 <div>
                   <p className="text-xs font-medium text-muted-foreground">{rel.name}</p>
@@ -120,7 +114,6 @@ const SynthesisPage = () => {
                 </div>
               </div>
 
-              {/* Verse card */}
               <div
                 className="rounded-2xl border border-border/60 bg-card p-6"
                 style={{ borderLeft: `3px solid hsl(var(${rel.colorVar}))` }}
@@ -143,7 +136,6 @@ const SynthesisPage = () => {
                 </p>
               </div>
 
-              {/* AI Answer (shown after synthesis) */}
               {answer && (
                 <div
                   className="rounded-xl p-5 border border-border/40 animate-fade-in"
@@ -156,7 +148,6 @@ const SynthesisPage = () => {
                 </div>
               )}
 
-              {/* Loading per panel */}
               {isLoading && !answer && (
                 <div className="rounded-xl p-5 border border-border/40" style={{ background: `hsl(var(${rel.colorVar}) / 0.05)` }}>
                   <div className="flex gap-1.5 items-center">
@@ -167,7 +158,6 @@ const SynthesisPage = () => {
                 </div>
               )}
 
-              {/* Interpretation */}
               <div className="rounded-xl bg-secondary/40 p-5">
                 <h4 className="text-sm font-semibold mb-2 text-foreground">{data.interpretation.title}</h4>
                 <p className="text-sm text-muted-foreground leading-relaxed">{data.interpretation.text}</p>
@@ -176,14 +166,12 @@ const SynthesisPage = () => {
           ))}
         </div>
 
-        {/* Error */}
         {error && (
           <div className="mt-6 p-4 rounded-xl bg-destructive/10 border border-destructive/30 text-sm text-destructive text-center">
             {error}
           </div>
         )}
 
-        {/* Audio player */}
         <div className="mt-8 rounded-2xl border border-border/60 bg-card p-4 flex items-center gap-4">
           <button
             onClick={() => setIsPlaying(!isPlaying)}
@@ -201,15 +189,13 @@ const SynthesisPage = () => {
         </div>
       </div>
 
-      {/* Bottom synthesis bar */}
       <div className="sticky bottom-0 p-4 pb-6 glass border-t border-border/50">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-2 mb-3">
             {[leftRel, rightRel].map((r) => {
-              const I = getFaithIcon(r.id);
               return (
                 <div key={r.id} className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-border/60 bg-card text-xs font-medium">
-                  <I size={12} color={`hsl(var(${r.colorVar}))`} />
+                  <img src={r.logo} alt={r.name} className="w-3.5 h-3.5 object-cover rounded-full flex-shrink-0" />
                   <span>{r.name}</span>
                 </div>
               );

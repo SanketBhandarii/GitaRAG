@@ -11,12 +11,10 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState<Step>("login");
 
-    // Login state
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showPwd, setShowPwd] = useState(false);
 
-    // Forgot password state
     const [fpEmail, setFpEmail] = useState("");
     const [fpOtp, setFpOtp] = useState("");
     const [newPwd, setNewPwd] = useState("");
@@ -100,16 +98,7 @@ const LoginPage = () => {
             </div>
 
             <div className="w-full max-w-sm">
-                {/* Logo */}
-                <div className="text-center mb-8">
-                    <button onClick={() => navigate("/")} className="text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity">
-                        Secular<span className="text-primary">AI</span>
-                    </button>
-                    <p className="text-muted-foreground text-sm mt-1">Explore the wisdom of all traditions</p>
-                </div>
-
                 <div className="bg-card border border-border rounded-2xl p-7 shadow-sm">
-                    {/* Login */}
                     {step === "login" && (
                         <>
                             <h2 className="text-xl font-semibold text-foreground mb-5">Welcome back</h2>
@@ -160,7 +149,6 @@ const LoginPage = () => {
                         </>
                     )}
 
-                    {/* Forgot Password */}
                     {step === "forgot" && (
                         <>
                             <h2 className="text-xl font-semibold text-foreground mb-1">Reset password</h2>
@@ -186,7 +174,6 @@ const LoginPage = () => {
                         </>
                     )}
 
-                    {/* Enter OTP + new password */}
                     {step === "otp" && (
                         <>
                             <h2 className="text-xl font-semibold text-foreground mb-1">Enter reset code</h2>

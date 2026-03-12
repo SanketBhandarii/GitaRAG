@@ -14,7 +14,6 @@ router = APIRouter(prefix="/api/auth", tags=["Authentication"])
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 
-# ── Schemas ────────────────────────────────────────────────────────────
 class UserCreate(BaseModel):
     username: str
     email: EmailStr
@@ -51,9 +50,6 @@ class UserResponse(BaseModel):
         orm_mode = True
 
 
-# ── Routes ─────────────────────────────────────────────────────────────
-
-
 @router.post("/register")
 async def register(
     user: UserCreate, background_tasks: BackgroundTasks, db: Session = Depends(get_db)
@@ -64,7 +60,6 @@ async def register(
         if db.query(User).filter(User.username == user.username).first():
             raise HTTPException(status_code=400, detail="Username already taken")
 
-        # Remove any stale pending entries
         db.query(PendingUser).filter(PendingUser.email == user.email).delete()
         db.query(PendingUser).filter(PendingUser.username == user.username).delete()
 
@@ -83,9 +78,8 @@ async def register(
         return {"message": "Verification code sent to your email. Valid for 3 minutes."}
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         import traceback
-
         trace_str = traceback.format_exc()
         print("REGISTER ERROR:", trace_str)
         raise HTTPException(status_code=500, detail=trace_str)
@@ -154,7 +148,6 @@ async def login(request: Request, db: Session = Depends(get_db)):
     if not username or not password:
         raise HTTPException(status_code=400, detail="Username and password required")
 
-    # Block unverified users
     pending = (
         db.query(PendingUser)
         .filter((PendingUser.username == username) | (PendingUser.email == username))
@@ -241,6 +234,4 @@ def reset_password(data: ResetPasswordRequest, db: Session = Depends(get_db)):
 
 @router.post("/logout")
 async def logout():
-    # In a stateless JWT setup, logout is primarily handled on the client side
-    # by deleting the token. This endpoint exists for consistency and future-proofing.
     return {"message": "Successfully logged out"}

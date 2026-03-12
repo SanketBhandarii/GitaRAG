@@ -11,14 +11,12 @@ const RegisterPage = () => {
     const navigate = useNavigate();
     const [step, setStep] = useState<Step>("register");
 
-    // Register fields
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [fullName, setFullName] = useState("");
     const [password, setPassword] = useState("");
     const [showPwd, setShowPwd] = useState(false);
 
-    // OTP
     const [otp, setOtp] = useState("");
 
     const [loading, setLoading] = useState(false);
@@ -100,17 +98,7 @@ const RegisterPage = () => {
             </div>
 
             <div className="w-full max-w-sm">
-                {/* Logo */}
-                <div className="text-center mb-8">
-                    <button onClick={() => navigate("/")} className="text-3xl font-bold tracking-tight hover:opacity-80 transition-opacity">
-                        Secular<span className="text-primary">AI</span>
-                    </button>
-                    <p className="text-muted-foreground text-sm mt-1">Start your spiritual exploration</p>
-                </div>
-
                 <div className="bg-card border border-border rounded-2xl p-7 shadow-sm">
-
-                    {/* Step 1: Register form */}
                     {step === "register" && (
                         <>
                             <h2 className="text-xl font-semibold text-foreground mb-5">Create account</h2>
@@ -179,7 +167,6 @@ const RegisterPage = () => {
                         </>
                     )}
 
-                    {/* Step 2: OTP Verification */}
                     {step === "otp" && (
                         <>
                             <div className="text-center mb-6">

@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Send, Copy, Bookmark, Volume2, Square, Menu, Plus, MessageSquare, X, Trash2, SendHorizontalIcon, LogOut, Check } from "lucide-react";
+import { ArrowLeft, Copy, Bookmark, Volume2, Square, Menu, Plus, MessageSquare, X, Trash2, SendHorizontalIcon, LogOut, Check } from "lucide-react";
 import { getScripture, getReligionByScriptureId, type ChatMessage } from "@/data/mockData";
-import { getFaithIcon } from "@/components/FaithIcons";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
   AlertDialog,
@@ -38,7 +37,6 @@ const sentimentColors: Record<string, string> = {
   Instructional: "42 70% 48%",
 };
 
-// Parse [VERSE title="..."]...[/VERSE] tags from the AI response
 function parseVerses(content: string): { cleanText: string; verses: { reference: string; text: string }[] } {
   const verses: { reference: string; text: string }[] = [];
   const regex = /\[VERSE title="(.+?)"\]([\s\S]*?)\[\/VERSE\]/g;
@@ -63,10 +61,9 @@ const ChatPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  // Dashboard state
   const [sessions, setSessions] = useState<Session[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true); // Open by default on large screens
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -75,9 +72,7 @@ const ChatPage = () => {
   const scripture = getScripture(scriptureId || "");
   const religion = getReligionByScriptureId(scriptureId || "");
   const colorVar = religion?.colorVar || "--primary";
-  const Icon = religion ? getFaithIcon(religion.id) : getFaithIcon("hinduism");
 
-  // Fetch token
   const token = localStorage.getItem("secularai-token");
 
   useEffect(() => {
@@ -256,19 +251,13 @@ const ChatPage = () => {
       }
     } finally {
       setIsLoading(false);
-      // Refresh sidebar titles if it was a new chat
       if (!currentSessionId) fetchSessions();
     }
-  };
-
-  const handleFollowUp = (text: string) => {
-    setInput(text);
   };
 
   return (
     <div className="min-h-screen bg-background flex overflow-hidden">
 
-      {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 z-40 bg-black/40 xl:hidden animate-fade-in"
@@ -276,7 +265,6 @@ const ChatPage = () => {
         />
       )}
 
-      {/* Sidebar (Desktop & Mobile drawer) */}
       <div className={`fixed inset-y-0 left-0 z-50 w-[85vw] max-w-[300px] bg-card border-r border-border/50 transform transition-all duration-300 ease-in-out xl:relative xl:w-72 ${isSidebarOpen ? "translate-x-0" : "-translate-x-full xl:-ml-72"}`}>
         <div className="h-full flex flex-col pt-4">
           <div className="px-4 pb-4 flex items-center justify-between xl:justify-start gap-4 border-b border-border/50">
@@ -289,7 +277,6 @@ const ChatPage = () => {
             >
               <Plus size={16} /> <span className="text-sm font-medium">New Chat</span>
             </button>
-            {/* Mobile close sidebar */}
             <button className="xl:hidden p-2 -mr-2 text-muted-foreground hover:text-foreground" onClick={() => setIsSidebarOpen(false)}>
               <X className="h-5 w-5" />
             </button>
@@ -339,7 +326,6 @@ const ChatPage = () => {
             )}
           </div>
 
-          {/* User Profile Area */}
           <div className="p-4 border-t border-border/50">
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-3 px-1">
@@ -368,10 +354,8 @@ const ChatPage = () => {
         </div>
       </div>
 
-      {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0 h-screen transition-all duration-300">
 
-        {/* Header */}
         <header className="sticky top-0 z-40 glass border-b border-border/50 shrink-0">
           <div className="flex items-center justify-between px-4 py-3 h-14">
             <div className="flex items-center gap-3">
@@ -383,25 +367,22 @@ const ChatPage = () => {
                 <Menu className="h-5 w-5" />
               </button>
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: `hsl(var(${colorVar}) / 0.15)` }}>
-                  <Icon size={14} color={`hsl(var(${colorVar}))`} />
+                <div className="w-7 h-7 rounded-md flex items-center justify-center bg-white/[0.03] border border-white/[0.08]">
+                  <img src={religion.logo} alt={religion.name} className="w-4 h-4 object-cover rounded-full flex-shrink-0" />
                 </div>
                 <span className="font-semibold text-[15px]">{scripture.name}</span>
               </div>
             </div>
-            {/* ThemeToggle hidden on mobile header since it's in sidebar */}
             <div className="hidden md:block"><ThemeToggle /></div>
           </div>
         </header>
 
-        {/* Chat Scroll container */}
         <div className="flex-1 overflow-y-auto w-full relative">
           <div className="max-w-3xl mx-auto px-4 py-8">
             {messages.length === 0 && !isLoading ? (
-              /* Welcome state */
               <div className="flex flex-col items-center text-center pt-[10vh] animate-fade-in-up">
-                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6" style={{ background: `hsl(var(${colorVar}) / 0.1)` }}>
-                  <Icon size={32} color={`hsl(var(${colorVar}))`} />
+                <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 bg-white/[0.03] border border-white/[0.08]">
+                  <img src={religion.logo} alt={religion.name} className="w-10 h-10 object-cover rounded-full flex-shrink-0" />
                 </div>
                 <h2 className="text-2xl font-bold mb-2 text-foreground">Ask {scripture.name}</h2>
                 <p className="text-muted-foreground text-[15px] mb-10 max-w-sm">{scripture.tagline}</p>
@@ -419,7 +400,6 @@ const ChatPage = () => {
                 </div>
               </div>
             ) : (
-              /* Messages */
               <div className="space-y-6">
                 {messages.map((msg) => (
                   <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"} animate-fade-in`}>
@@ -429,7 +409,6 @@ const ChatPage = () => {
                       </div>
                     ) : (
                       <div className="w-full max-w-[95%] space-y-3">
-                        {/* AI label */}
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center">
                             <span className="text-[11px] font-bold text-primary-foreground">S</span>
@@ -448,11 +427,9 @@ const ChatPage = () => {
                           )}
                         </div>
 
-                        {/* Message content - No left border as requested */}
                         <div className="pl-9 format-markdown">
                           <p className="text-[15px] leading-relaxed text-foreground whitespace-pre-wrap">{msg.content}</p>
 
-                          {/* Verse tiles */}
                           {msg.verses?.map((v, i) => (
                             <div
                               key={i}
@@ -499,7 +476,6 @@ const ChatPage = () => {
                   </div>
                 ))}
 
-                {/* Better Loading Shimmer */}
                 {isLoading && (
                   <div className="flex justify-start animate-fade-in w-full">
                     <div className="w-full max-w-[95%] space-y-3">
@@ -528,7 +504,6 @@ const ChatPage = () => {
           </div>
         </div>
 
-        {/* Floating input */}
         <div className="shrink-0 p-4 pb-6 bg-background">
           <div className="max-w-3xl mx-auto">
             <PromptInput
@@ -590,7 +565,6 @@ const ChatPage = () => {
 
       </div>
 
-      {/* Mobile overlay */}
       {isSidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden animate-fade-in"

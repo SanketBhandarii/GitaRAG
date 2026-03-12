@@ -8,11 +8,9 @@ import os
 
 load_dotenv()
 
-# Suppress HuggingFace/Mistral tokenizer warnings if no token is provided
 if not os.environ.get("HF_TOKEN"):
     os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-# Pinecone init — wrapped so the server still starts even if key is invalid
 pc = None
 index = None
 vector_store = None
@@ -25,7 +23,6 @@ try:
     print("[OK] Pinecone + Mistral embeddings connected.")
 except Exception as e:
     print(f"[WARNING] Pinecone init failed: {e}")
-    print("[WARNING] /query endpoint will not work until this is fixed.")
     embeddings = None
 
 chat = Groq(api_key=os.environ.get("GROQ_API_KEY"))
@@ -34,18 +31,9 @@ chat_history = ChatMessageHistory()
 
 def is_harmful_query(q: str):
     bad = [
-        "kill",
-        "murder",
-        "hurt someone",
-        "attack",
-        "self harm",
-        "suicide",
-        "end my life",
-        "rape",
-        "abuse",
-        "violent",
-        "bomb",
-        "terror",
+        "kill", "murder", "hurt someone", "attack", "self harm",
+        "suicide", "end my life", "rape", "abuse", "violent",
+        "bomb", "terror"
     ]
     q = q.lower()
     return any(b in q for b in bad)
@@ -64,10 +52,8 @@ def get_ai_reply(
     if is_harmful_query(query):
         return "I cannot guide you toward harm. But I can help you calm your mind. Tell me what you are feeling."
 
-    # Determine namespace from scripture name
-    # Mapping logic to match the filenames in ./data/
     s_cleaned = scripture.lower()
-    namespace = "gita"  # default
+    namespace = "gita"
     if "bible" in s_cleaned:
         namespace = "bible"
     elif "quran" in s_cleaned:
@@ -81,7 +67,6 @@ def get_ai_reply(
 
     context_docs = similarity_search(query, namespace=namespace, k=3)
     context = "\n\n".join([d.page_content for d in context_docs])
-    # ... (rest of the prompt remains the same)
 
     system_prompt = f"""
 You are a wise and compassionate guide representing the teachings of {scripture} from the {religion} tradition, speaking in simple modern English.
@@ -100,7 +85,6 @@ Rules:
 6. English should be very simple and easy to understand.
 7. Respond in the user's language.
 8. Avoid medical/legal/harmful advice.
-
 """
 
     user_prompt = f"""

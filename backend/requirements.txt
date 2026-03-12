@@ -13,7 +13,7 @@ pypdf
 google-genai
 langchain-google-genai
 pinecone
-
+pyreadline3
 # Auth & DB
 sqlalchemy
 psycopg2-binary
