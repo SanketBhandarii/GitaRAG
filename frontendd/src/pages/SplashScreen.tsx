@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const PARTICLES = Array.from({ length: 80 }, (_, i) => ({
   id: i,
@@ -129,11 +130,27 @@ export default function SplashScreen() {
   const s = SCRIPTURES[active];
 
   return (
-    <div className="min-h-screen dark bg-background text-foreground font-sans overflow-x-hidden relative flex flex-col transition-colors duration-1000">
+    <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden relative flex flex-col transition-colors duration-1000">
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        :root {
+          --grid-color: rgba(0,0,0,0.04);
+          --pill-bg: rgba(0,0,0,0.04);
+          --pill-border: rgba(0,0,0,0.1);
+          --pill-text: rgba(0,0,0,0.5);
+          --card-bg: rgba(0,0,0,0.02);
+        }
+        .dark {
+          --grid-color: rgba(255,255,255,0.014);
+          --pill-bg: rgba(255,255,255,0.025);
+          --pill-border: rgba(255,255,255,0.07);
+          --pill-text: rgba(255,255,255,0.28);
+          --card-bg: rgba(255,255,255,0.022);
+        }
+
         @keyframes twinkle {
           0%, 100% { opacity: 0.07; transform: scale(1); }
           50% { opacity: 0.65; transform: scale(1.5); }
@@ -164,9 +181,16 @@ export default function SplashScreen() {
         .anim-6 { animation: fadeUp0 0.8s ease 0.9s forwards; opacity: 0; }
         .anim-7 { animation: fadeUp0 0.8s ease 1.1s forwards; opacity: 0; }
         .mobile-menu { animation: slideInRight 0.25s ease forwards; }
-        .pill-btn:hover { border-color: rgba(255,255,255,0.2) !important; color: rgba(255,255,255,0.7) !important; }
-        .nav-link:hover { color: rgba(255,255,255,0.88) !important; }
-        .cta-ghost:hover { background: rgba(255,255,255,0.07) !important; color: rgba(255,255,255,0.85) !important; }
+
+        .pill-btn:hover { border-color: rgba(0,0,0,0.2) !important; color: rgba(0,0,0,0.7) !important; }
+        .dark .pill-btn:hover { border-color: rgba(255,255,255,0.2) !important; color: rgba(255,255,255,0.7) !important; }
+        
+        .nav-link:hover { color: rgba(0,0,0,0.88) !important; }
+        .dark .nav-link:hover { color: rgba(255,255,255,0.88) !important; }
+
+        .cta-ghost:hover { background: rgba(0,0,0,0.07) !important; color: rgba(0,0,0,0.85) !important; }
+        .dark .cta-ghost:hover { background: rgba(255,255,255,0.07) !important; color: rgba(255,255,255,0.85) !important; }
+        
         .cta-main:hover { filter: brightness(1.1); transform: translateY(-2px); }
         .cta-main { transition: all 0.25s ease; }
         .pills-scroll { scrollbar-width: none; -ms-overflow-style: none; }
@@ -197,7 +221,7 @@ export default function SplashScreen() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.014) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.014) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(var(--grid-color) 1px, transparent 1px), linear-gradient(90deg, var(--grid-color) 1px, transparent 1px)`,
             backgroundSize: "72px 72px",
           }}
         />
@@ -206,7 +230,7 @@ export default function SplashScreen() {
       {mounted && PARTICLES.map((p) => (
         <div
           key={p.id}
-          className="absolute rounded-full bg-white pointer-events-none"
+          className="absolute rounded-full bg-black dark:bg-white pointer-events-none"
           style={{
             left: `${p.x}%`, top: `${p.y}%`,
             width: `${p.size}px`, height: `${p.size}px`,
@@ -216,7 +240,7 @@ export default function SplashScreen() {
         />
       ))}
 
-      <nav className={`relative z-20 flex justify-between items-center px-5 sm:px-14 py-5 border-b border-white/5 ${mounted ? "anim-nav" : "opacity-0"}`}>
+      <nav className={`relative z-20 flex justify-between items-center px-5 sm:px-14 py-5 border-b border-black/5 dark:border-white/5 ${mounted ? "anim-nav" : "opacity-0"}`}>
         <div className="flex items-center gap-3">
           <span className="text-[20px] font-bold tracking-tight text-foreground/90">
             Secular<span style={{ color: s.color, transition: "color 0.8s" }}>AI</span>
@@ -233,6 +257,7 @@ export default function SplashScreen() {
               {item}
             </a>
           ))}
+          <ThemeToggle />
           <button
             onClick={() => navigate("/login")}
             className="px-5 py-2 rounded-lg text-[13px] font-medium tracking-wide border transition-all duration-700 cursor-pointer"
@@ -247,23 +272,26 @@ export default function SplashScreen() {
           </button>
         </div>
 
-        <button
-          className="md:hidden flex flex-col justify-center gap-[5px] w-8 h-8 bg-transparent border-0 cursor-pointer z-50"
-          onClick={() => setMenuOpen(!menuOpen)}
-        >
-          <span
-            className="block w-5 h-[1.5px] bg-white/60 transition-all duration-300 origin-center"
-            style={{ transform: menuOpen ? "rotate(45deg) translate(4px, 4px)" : "none" }}
-          />
-          <span
-            className="block w-5 h-[1.5px] bg-white/60 transition-all duration-300"
-            style={{ opacity: menuOpen ? 0 : 1 }}
-          />
-          <span
-            className="block w-5 h-[1.5px] bg-white/60 transition-all duration-300 origin-center"
-            style={{ transform: menuOpen ? "rotate(-45deg) translate(4px, -4px)" : "none" }}
-          />
-        </button>
+        <div className="md:hidden flex items-center gap-4">
+          <ThemeToggle />
+          <button
+            className="flex flex-col justify-center gap-[5px] w-8 h-8 bg-transparent border-0 cursor-pointer z-50"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            <span
+              className="block w-5 h-[1.5px] bg-black/60 dark:bg-white/60 transition-all duration-300 origin-center"
+              style={{ transform: menuOpen ? "rotate(45deg) translate(4px, 4px)" : "none" }}
+            />
+            <span
+              className="block w-5 h-[1.5px] bg-black/60 dark:bg-white/60 transition-all duration-300"
+              style={{ opacity: menuOpen ? 0 : 1 }}
+            />
+            <span
+              className="block w-5 h-[1.5px] bg-black/60 dark:bg-white/60 transition-all duration-300 origin-center"
+              style={{ transform: menuOpen ? "rotate(-45deg) translate(4px, -4px)" : "none" }}
+            />
+          </button>
+        </div>
       </nav>
 
       {menuOpen && (
@@ -273,11 +301,10 @@ export default function SplashScreen() {
             onClick={() => setMenuOpen(false)}
           />
           <div
-            className="mobile-menu fixed top-0 right-0 h-full w-[260px] z-40 md:hidden flex flex-col pt-20 pb-8 px-7 gap-6 border-l border-white/8"
-            style={{ background: "rgba(8,7,14,0.97)", backdropFilter: "blur(24px)" }}
+            className="mobile-menu fixed top-0 right-0 h-full w-[260px] z-40 md:hidden flex flex-col pt-20 pb-8 px-7 gap-6 border-l border-black/10 dark:border-white/8 bg-background/95 backdrop-blur-3xl"
           >
             <button
-              className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-white/5 border border-white/10 rounded-lg text-white/50 cursor-pointer text-lg"
+              className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-lg text-black/50 dark:text-white/50 cursor-pointer text-lg"
               onClick={() => setMenuOpen(false)}
             >
               ✕
@@ -289,7 +316,7 @@ export default function SplashScreen() {
               <a
                 key={item}
                 href="#"
-                className="text-[15px] font-medium text-white/40 no-underline hover:text-white/80 transition-colors"
+                className="text-[15px] font-medium text-black/40 dark:text-white/40 no-underline hover:text-black/80 dark:hover:text-white/80 transition-colors"
                 onClick={() => setMenuOpen(false)}
               >
                 {item}
@@ -312,7 +339,7 @@ export default function SplashScreen() {
 
       <main className="flex-1 relative z-10 flex flex-col items-center justify-center px-5 sm:px-6 pt-12 pb-6 text-center">
 
-        <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-9 border border-white/8 bg-white/[0.03] ${mounted ? "anim-1" : "opacity-0"}`}>
+        <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-9 border border-black/10 dark:border-white/8 bg-black/[0.03] dark:bg-white/[0.03] ${mounted ? "anim-1" : "opacity-0"}`}>
           <span className="text-[11px] text-muted-foreground tracking-widest font-medium uppercase">
             Books from different religions
           </span>
@@ -322,7 +349,7 @@ export default function SplashScreen() {
           <h1 className="text-[clamp(36px,7.5vw,76px)] font-extrabold leading-[1.06] text-foreground tracking-[-0.03em] mb-1">
             What does your
           </h1>
-          <h1 className="text-[clamp(36px,7.5vw,70px)] font-light leading-[1.06] text-gray-400 tracking-[-0.03em]">
+          <h1 className="text-[clamp(36px,7.5vw,70px)] font-light leading-[1.06] text-gray-600 dark:text-gray-400 tracking-[-0.03em]">
             scripture actually say?
           </h1>
         </div>
@@ -354,9 +381,9 @@ export default function SplashScreen() {
                 className="pill-btn flex items-center gap-2 px-4 py-2 rounded-full text-[12px] font-medium tracking-wide cursor-pointer transition-all duration-300 whitespace-nowrap border flex-shrink-0"
                 onClick={() => handlePillClick(i)}
                 style={{
-                  background: active === i ? `${sc.color}12` : "rgba(255,255,255,0.025)",
-                  borderColor: active === i ? `${sc.color}45` : "rgba(255,255,255,0.07)",
-                  color: active === i ? sc.color : "rgba(255,255,255,0.28)",
+                  background: active === i ? `${sc.color}12` : "var(--pill-bg)",
+                  borderColor: active === i ? `${sc.color}45` : "var(--pill-border)",
+                  color: active === i ? sc.color : "var(--pill-text)",
                   boxShadow: active === i ? `0 0 12px ${sc.color}18` : "none",
                   fontWeight: active === i ? "600" : "400",
                 }}
@@ -371,7 +398,7 @@ export default function SplashScreen() {
         <div
           className={`max-w-[500px] w-full rounded-2xl border p-5 sm:p-6 backdrop-blur-xl ${mounted ? "anim-6" : "opacity-0"}`}
           style={{
-            background: "rgba(255,255,255,0.022)",
+            background: "var(--card-bg)",
             borderColor: `${s.color}18`,
             opacity: infoVisible ? 1 : 0,
             transform: infoVisible ? "translateY(0)" : "translateY(10px)",
@@ -395,7 +422,7 @@ export default function SplashScreen() {
               </div>
             </div>
             <div className="ml-auto text-right flex-shrink-0">
-              <div className="text-[10px] text-white/18 tracking-widest uppercase mb-1">Established</div>
+              <div className="text-[10px] text-black/30 dark:text-white/18 tracking-widest uppercase mb-1">Established</div>
               <div className="text-[13px] font-semibold text-foreground/50">{s.established}</div>
             </div>
           </div>
@@ -410,14 +437,14 @@ export default function SplashScreen() {
           </p>
 
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-white/18 tracking-widest uppercase">Origin</span>
+            <span className="text-[10px] text-black/30 dark:text-white/18 tracking-widest uppercase">Origin</span>
             <span className="text-[12px] text-muted-foreground font-medium">{s.origin}</span>
           </div>
         </div>
 
       </main>
 
-      <div className={`relative z-10 border-t border-white/[0.045] py-5 px-5 sm:px-14 flex justify-center gap-8 sm:gap-20 flex-wrap ${mounted ? "anim-7" : "opacity-0"}`}>
+      <div className={`relative z-10 border-t border-black/[0.05] dark:border-white/[0.045] py-5 px-5 sm:px-14 flex justify-center gap-8 sm:gap-20 flex-wrap ${mounted ? "anim-7" : "opacity-0"}`}>
         {[
           { label: "Scriptures", value: "6" },
           { label: "Verses Indexed", value: "50,000+" },
