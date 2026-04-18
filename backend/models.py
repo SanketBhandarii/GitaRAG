@@ -67,3 +67,14 @@ class PDFUpload(Base):
     filename = Column(String, nullable=False)
     namespace = Column(String, nullable=False, unique=True, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class UserInsight(Base):
+    __tablename__ = "user_insights"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True, nullable=False, unique=True)
+    archetype = Column(String, nullable=False)
+    raw_take = Column(Text, nullable=False)
+    tags_json = Column(Text, nullable=False)  # JSON array string
+    generated_at = Column(DateTime(timezone=True), server_default=func.now())

@@ -10,6 +10,7 @@ import models
 from auth_router import router as auth_router
 from chat_router import router as chat_router
 from pdf_router import router as pdf_router
+from insights_router import router as insights_router
 from query import get_ai_reply
 
 models.Base.metadata.create_all(bind=engine)
@@ -55,6 +56,7 @@ async def log_cors_details(request: Request, call_next):
 app.include_router(auth_router)
 app.include_router(chat_router)
 app.include_router(pdf_router)
+app.include_router(insights_router)
 
 
 class QueryRequest(BaseModel):
