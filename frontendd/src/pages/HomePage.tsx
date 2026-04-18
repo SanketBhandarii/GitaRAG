@@ -306,7 +306,7 @@ const HomePage = () => {
               <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
                 <div className="flex items-center gap-2">
                   <Brain className="h-4 w-4 text-primary" />
-                  <h2 className="text-sm font-semibold">Soul Snapshot</h2>
+                  <h2 className="text-sm font-semibold">How You Think</h2>
                   <span className="text-[10px] text-muted-foreground bg-secondary/60 px-2 py-0.5 rounded-full">1× per day</span>
                 </div>
                 <p className="text-[11px] text-muted-foreground hidden sm:block">
@@ -356,7 +356,7 @@ const HomePage = () => {
                         )}
                       </div>
                     </div>
-                    <p className="text-sm text-foreground/80 leading-relaxed">{insight.raw_take}</p>
+                    <p className="text-[15px] font-medium text-foreground leading-relaxed border-l-2 border-primary/60 pl-4 py-1">{insight.raw_take}</p>
                     <div className="flex flex-wrap gap-2">
                       {insight.tags.map(tag => (
                         <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">{tag}</span>
@@ -393,7 +393,7 @@ const HomePage = () => {
                             <p className="text-[11px] text-muted-foreground mt-1">Refreshes in ~24h</p>
                           </div>
                         </div>
-                        <p className="text-sm text-foreground/80 leading-relaxed">{insight.raw_take}</p>
+                        <p className="text-[15px] font-medium text-foreground leading-relaxed border-l-2 border-primary/60 pl-4 py-1">{insight.raw_take}</p>
                         <div className="flex flex-wrap gap-2">
                           {insight.tags.map(tag => (
                             <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">{tag}</span>

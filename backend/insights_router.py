@@ -14,10 +14,13 @@ router = APIRouter(prefix="/api/insights", tags=["Soul Snapshot"])
 groq_client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 SYSTEM_PROMPT = (
-    'You are observant. Analyze these questions and output ONLY valid JSON: '
-    '{"archetype":"2-3 words","raw_take":"2 sentences. Plain English. '
-    'What these questions actually reveal about this person\'s current mindset. '
-    'Specific, not generic. No metaphors, no dramatic phrasing.","tags":["#Tag1","#Tag2","#Tag3"]}'
+    'Analyze these questions and output ONLY valid JSON with no extra text: '
+    '{"archetype":"2-3 word label","raw_take":"2 short sentences. '
+    'Write directly to the user as YOU. Simple words that anyone can understand. '
+    'Say what their questions actually show about what they are going through right now. '
+    'No big words, no clinical terms, no third person like This person. Example good output: '
+    'You keep asking about things you cannot control. Looks like something happened recently and you are still trying to make sense of it.",'
+    '"tags":["#Tag1","#Tag2","#Tag3"]}'
 )
 
 
