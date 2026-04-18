@@ -387,12 +387,12 @@ export default function SplashScreen() {
 
         <div className={`flex gap-3 mb-14 ${mounted ? "anim-4" : "opacity-0"}`}>
           <button
-            className="cta-main px-7 py-3 rounded-xl text-[15px] font-semibold tracking-wide cursor-pointer border-0"
+            className="hover:opacity-80 px-7 py-3 rounded-xl text-[15px] font-semibold tracking-wide cursor-pointer border-0"
             style={{
               background: s.color,
               color: "#05040e",
               boxShadow: `0 0 26px ${s.color}45, 0 4px 18px rgba(0,0,0,0.4)`,
-              transition: "background 0.8s ease, box-shadow 0.8s ease",
+              transition: "background 0.8s ease, box-shadow 0.8s ease, opacity 0.25s ease",
             }}
             onClick={() => navigate("/home")}
           >
