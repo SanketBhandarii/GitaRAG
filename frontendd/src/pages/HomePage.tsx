@@ -255,6 +255,98 @@ const HomePage = () => {
               })}
             </div>
 
+            {/* How You Think — Eye-catching glowing strip ABOVE scripture grid */}
+            {token && (
+              <div
+                className="relative my-2 mb-6 rounded-2xl overflow-hidden cursor-pointer"
+                style={{
+                  background: 'linear-gradient(135deg, hsl(var(--primary) / 0.10) 0%, hsl(var(--primary) / 0.04) 60%, transparent 100%)',
+                  border: '1px solid hsl(var(--primary) / 0.30)',
+                  boxShadow: '0 0 32px hsl(var(--primary) / 0.10), inset 0 1px 0 hsl(var(--primary) / 0.15)',
+                }}
+              >
+                {/* Top glow line */}
+                <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), transparent)' }} />
+
+                {!showInsightPanel && !insight ? (
+                  /* Compact teaser strip */
+                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-6 py-5">
+                    <div className="text-center sm:text-left">
+                      <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+                        <Brain className="h-3.5 w-3.5 text-primary" />
+                        <span className="text-[11px] font-bold text-primary uppercase tracking-widest">How You Think</span>
+                        <span className="text-[10px] text-muted-foreground/70 bg-secondary/60 px-2 py-0.5 rounded-full">1× per day</span>
+                      </div>
+                      <p className="text-[15px] font-semibold text-foreground">What do your questions actually say about you?</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">Your patterns, what you keep going back to, how you really see things.</p>
+                    </div>
+                    <div className="relative shrink-0">
+                      <div className="absolute inset-0 rounded-xl animate-ping opacity-25" style={{ background: 'hsl(var(--primary))' }} />
+                      <button
+                        onClick={handleGenerateInsight}
+                        disabled={insightLoading}
+                        className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                        style={{ background: 'hsl(var(--primary))', color: 'white', boxShadow: '0 4px 20px hsl(var(--primary) / 0.45)' }}
+                      >
+                        {insightLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                        See What My Chats Reveal
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Expanded result inside same card */
+                  <div className="px-6 py-5 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Brain className="h-3.5 w-3.5 text-primary" />
+                        <span className="text-[11px] font-bold text-primary uppercase tracking-widest">How You Think</span>
+                      </div>
+                      {insight && !insightLoading && (
+                        <div className="flex items-center gap-3">
+                          <span className="text-[11px] text-muted-foreground">{insight.generated_at === 'just_now' ? 'Just now' : timeAgo(insight.generated_at)}</span>
+                          {insight.can_regenerate ? (
+                            <button onClick={handleGenerateInsight} disabled={insightLoading} className="flex items-center gap-1 text-xs text-primary hover:opacity-70 transition-opacity">
+                              <RefreshCw className="h-3 w-3" /> Refresh
+                            </button>
+                          ) : (
+                            <span className="text-[11px] text-muted-foreground">Refreshes in ~24h</span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {insightLoading && (
+                      <div className="flex items-center gap-3 text-sm text-muted-foreground py-3">
+                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
+                        Reading your conversations...
+                      </div>
+                    )}
+
+                    {insightError && (
+                      <div className="rounded-xl bg-secondary/40 border border-border/40 p-4 text-sm text-muted-foreground">
+                        {insightError}
+                      </div>
+                    )}
+
+                    {insight && !insightLoading && !insightError && (
+                      <>
+                        <div>
+                          <p className="text-[11px] text-muted-foreground uppercase tracking-widest mb-1">Your Archetype</p>
+                          <h3 className="text-2xl font-bold text-foreground">{insight.archetype}</h3>
+                        </div>
+                        <p className="text-[15px] font-medium text-foreground leading-relaxed border-l-2 border-primary/60 pl-4 py-1">{insight.raw_take}</p>
+                        <div className="flex flex-wrap gap-2">
+                          {insight.tags.map(tag => (
+                            <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">{tag}</span>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <section className="animate-fade-in" key={activeReligion}>
               <h2 className="text-lg font-semibold mb-4">
                 {activeRel.name} Scriptures
@@ -298,117 +390,7 @@ const HomePage = () => {
           </>
         )}
 
-        {/* Soul Snapshot Section — only for logged-in users */}
-        {token && (
-          <section className="mt-12">
-            <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
-              {/* Header row */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-border/40">
-                <div className="flex items-center gap-2">
-                  <Brain className="h-4 w-4 text-primary" />
-                  <h2 className="text-sm font-semibold">How You Think</h2>
-                  <span className="text-[10px] text-muted-foreground bg-secondary/60 px-2 py-0.5 rounded-full">1× per day</span>
-                </div>
-                <p className="text-[11px] text-muted-foreground hidden sm:block">
-                  Based on your conversations · needs at least 5 questions
-                </p>
-              </div>
-
-              <div className="p-5">
-                {/* Teaser text shown always, before any insight */}
-                {!showInsightPanel && !insight && (
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                    <p className="text-sm text-muted-foreground max-w-md leading-relaxed">
-                      SecularAI reads all your questions across every scripture and tells you what's actually been on your mind — your thinking patterns, what you keep returning to, what category you fall in.
-                    </p>
-                    <button
-                      onClick={handleGenerateInsight}
-                      disabled={insightLoading}
-                      className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-50"
-                      style={{ background: "hsl(var(--primary))", color: "white" }}
-                    >
-                      {insightLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Brain className="h-4 w-4" />}
-                      See What My Chats Say
-                    </button>
-                  </div>
-                )}
-
-                {/* Existing cached insight shown on load */}
-                {!showInsightPanel && insight && (
-                  <div className="space-y-4">
-                    <div className="flex items-start justify-between gap-4 flex-wrap">
-                      <div>
-                        <p className="text-[11px] text-muted-foreground uppercase tracking-widest mb-1">Your Archetype</p>
-                        <h3 className="text-xl font-bold text-foreground">{insight.archetype}</h3>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[11px] text-muted-foreground">{timeAgo(insight.generated_at)}</p>
-                        {insight.can_regenerate ? (
-                          <button
-                            onClick={handleGenerateInsight}
-                            disabled={insightLoading}
-                            className="mt-1 flex items-center gap-1.5 text-xs text-primary hover:opacity-70 transition-opacity"
-                          >
-                            <RefreshCw className="h-3 w-3" /> Refresh
-                          </button>
-                        ) : (
-                          <p className="text-[11px] text-muted-foreground mt-1">Refreshes in ~24h</p>
-                        )}
-                      </div>
-                    </div>
-                    <p className="text-[15px] font-medium text-foreground leading-relaxed border-l-2 border-primary/60 pl-4 py-1">{insight.raw_take}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {insight.tags.map(tag => (
-                        <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">{tag}</span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Panel shown after user clicks generate */}
-                {showInsightPanel && (
-                  <div className="space-y-4">
-                    {insightLoading && (
-                      <div className="flex items-center gap-3 text-sm text-muted-foreground py-2">
-                        <Loader2 className="h-4 w-4 animate-spin text-primary" />
-                        Reading your conversations...
-                      </div>
-                    )}
-
-                    {insightError && (
-                      <div className="rounded-xl bg-secondary/40 border border-border/40 p-4 text-sm text-muted-foreground">
-                        {insightError}
-                      </div>
-                    )}
-
-                    {insight && !insightLoading && !insightError && (
-                      <div className="space-y-4">
-                        <div className="flex items-start justify-between gap-4 flex-wrap">
-                          <div>
-                            <p className="text-[11px] text-muted-foreground uppercase tracking-widest mb-1">Your Archetype</p>
-                            <h3 className="text-xl font-bold text-foreground">{insight.archetype}</h3>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-[11px] text-muted-foreground">Just now</p>
-                            <p className="text-[11px] text-muted-foreground mt-1">Refreshes in ~24h</p>
-                          </div>
-                        </div>
-                        <p className="text-[15px] font-medium text-foreground leading-relaxed border-l-2 border-primary/60 pl-4 py-1">{insight.raw_take}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {insight.tags.map(tag => (
-                            <span key={tag} className="text-xs px-2.5 py-1 rounded-full bg-primary/10 text-primary font-medium">{tag}</span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-        )}
-
-        <section className="mt-8">
+<section className="mt-8">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Daily Wisdom</h2>
