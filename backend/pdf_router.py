@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, BackgroundTasks
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
 import os
@@ -16,8 +16,34 @@ from pinecone import Pinecone
 
 router = APIRouter(prefix="/api/chat", tags=["Dynamic PDF"])
 
+def process_pdf_background(tmp_path: str, namespace: str):
+    try:
+        loader = PyPDFLoader(tmp_path)
+        documents = loader.load()
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000, chunk_overlap=100, separators=["\n\n", "\n", " ", ""]
+        )
+        texts = text_splitter.split_documents(documents)
+
+        pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
+        index = pc.Index("gita")
+        embeddings = MistralAIEmbeddings(model="mistral-embed")
+        vector_store = PineconeVectorStore(index=index, embedding=embeddings)
+
+        batch_size = 100
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i : i + batch_size]
+            batch_uuids = [str(uuid.uuid4()) for _ in range(len(batch))]
+            vector_store.add_documents(documents=batch, ids=batch_uuids, namespace=namespace)
+    except Exception as e:
+        print(f"Background PDF processing failed for namespace {namespace}: {e}")
+    finally:
+        if os.path.exists(tmp_path):
+            os.remove(tmp_path)
+
 @router.post("/upload-pdf")
 async def upload_pdf(
+    background_tasks: BackgroundTasks,
     session_id: str = Form(...),
     file: UploadFile = File(...),
     current_user: User = Depends(get_current_user),
@@ -53,41 +79,17 @@ async def upload_pdf(
         tmp.write(content)
         tmp_path = tmp.name
 
-    try:
-        loader = PyPDFLoader(tmp_path)
-        documents = loader.load()
-        text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000, chunk_overlap=100, separators=["\n\n", "\n", " ", ""]
-        )
-        texts = text_splitter.split_documents(documents)
+    new_pdf = PDFUpload(
+        user_id=current_user.id,
+        session_id=session_id,
+        filename=file.filename,
+        namespace=namespace
+    )
+    db.add(new_pdf)
+    db.commit()
 
-        pc = Pinecone(api_key=os.environ.get("PINECONE_API_KEY"))
-        index = pc.Index("gita")
-        embeddings = MistralAIEmbeddings(model="mistral-embed")
-        vector_store = PineconeVectorStore(index=index, embedding=embeddings)
-
-        batch_size = 100
-        for i in range(0, len(texts), batch_size):
-            batch = texts[i : i + batch_size]
-            batch_uuids = [str(uuid.uuid4()) for _ in range(len(batch))]
-            vector_store.add_documents(documents=batch, ids=batch_uuids, namespace=namespace)
-
-        new_pdf = PDFUpload(
-            user_id=current_user.id,
-            session_id=session_id,
-            filename=file.filename,
-            namespace=namespace
-        )
-        db.add(new_pdf)
-        db.commit()
-
-        return {"message": "PDF processed successfully", "filename": file.filename}
-
-    except Exception as e:
-        print("Upload Error:", e)
-        raise HTTPException(status_code=500, detail="Failed to process PDF")
-    finally:
-        os.remove(tmp_path)
+    background_tasks.add_task(process_pdf_background, tmp_path, namespace)
+    return {"message": "PDF uploaded successfully and is processing in the background", "filename": file.filename}
 
 
 @router.get("/sessions/{session_id}/pdfs")

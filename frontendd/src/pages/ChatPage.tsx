@@ -218,6 +218,12 @@ const ChatPage = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 4.5 * 1024 * 1024) {
+      alert("File is too large! Please upload a PDF under 4.5MB to prevent server errors.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
     let activeSessionId = currentSessionId;
     if (!activeSessionId) {
       activeSessionId = await createNewSession();
