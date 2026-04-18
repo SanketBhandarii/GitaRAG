@@ -9,6 +9,7 @@ from database import engine, get_db
 import models
 from auth_router import router as auth_router
 from chat_router import router as chat_router
+from pdf_router import router as pdf_router
 from query import get_ai_reply
 
 models.Base.metadata.create_all(bind=engine)
@@ -53,6 +54,7 @@ async def log_cors_details(request: Request, call_next):
 
 app.include_router(auth_router)
 app.include_router(chat_router)
+app.include_router(pdf_router)
 
 
 class QueryRequest(BaseModel):
@@ -90,11 +92,15 @@ def query_scripture(request: QueryRequest, db: Session = Depends(get_db)):
     db.add(user_msg)
     db.commit()
 
+    pdfs = db.query(models.PDFUpload).filter(models.PDFUpload.session_id == request.session_id).all()
+    pdf_namespaces = [pdf.namespace for pdf in pdfs]
+
     reply = get_ai_reply(
         request.user_query,
         history_text,
         religion=request.religion,
         scripture=request.scripture,
+        pdf_namespaces=pdf_namespaces,
     )
 
     verses_data = []

@@ -56,3 +56,14 @@ class ChatMessage(Base):
     verses_json = Column(Text, nullable=True)
     sentiment = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class PDFUpload(Base):
+    __tablename__ = "pdf_uploads"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True, nullable=False)
+    session_id = Column(String, index=True, nullable=False)
+    filename = Column(String, nullable=False)
+    namespace = Column(String, nullable=False, unique=True, index=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

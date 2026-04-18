@@ -258,18 +258,31 @@ export default function SplashScreen() {
             </a>
           ))}
           <ThemeToggle />
-          <button
-            onClick={() => navigate("/login")}
-            className="px-5 py-2 rounded-lg text-[13px] font-medium tracking-wide border transition-all duration-700 cursor-pointer"
-            style={{
-              background: `${s.color}12`,
-              borderColor: `${s.color}35`,
-              color: s.color,
-              transition: "all 0.8s ease",
-            }}
-          >
-            Sign In
-          </button>
+          {localStorage.getItem("secularai-token") ? (
+            <button
+              onClick={() => navigate("/home")}
+              className="px-5 py-2 rounded-lg text-[13px] font-medium tracking-wide border transition-all duration-700 cursor-pointer"
+              style={{
+                background: `${s.color}12`,
+                borderColor: `${s.color}35`,
+                color: s.color,
+              }}
+            >
+              Go to App
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate("/login")}
+              className="px-5 py-2 rounded-lg text-[13px] font-medium tracking-wide border transition-all duration-700 cursor-pointer"
+              style={{
+                background: `${s.color}12`,
+                borderColor: `${s.color}35`,
+                color: s.color,
+              }}
+            >
+              Sign In
+            </button>
+          )}
         </div>
 
         <div className="md:hidden flex items-center gap-4">
@@ -322,17 +335,31 @@ export default function SplashScreen() {
                 {item}
               </a>
             ))}
-            <button
-              onClick={() => { setMenuOpen(false); navigate("/login"); }}
-              className="mt-2 px-5 py-2.5 rounded-lg text-[13px] font-medium tracking-wide border cursor-pointer w-fit"
-              style={{
-                background: `${s.color}15`,
-                borderColor: `${s.color}40`,
-                color: s.color,
-              }}
-            >
-              Sign In
-            </button>
+            {localStorage.getItem("secularai-token") ? (
+              <button
+                onClick={() => { setMenuOpen(false); navigate("/home"); }}
+                className="mt-2 px-5 py-2.5 rounded-lg text-[13px] font-medium tracking-wide border cursor-pointer w-fit"
+                style={{
+                  background: `${s.color}15`,
+                  borderColor: `${s.color}40`,
+                  color: s.color,
+                }}
+              >
+                Go to App
+              </button>
+            ) : (
+              <button
+                onClick={() => { setMenuOpen(false); navigate("/login"); }}
+                className="mt-2 px-5 py-2.5 rounded-lg text-[13px] font-medium tracking-wide border cursor-pointer w-fit"
+                style={{
+                  background: `${s.color}15`,
+                  borderColor: `${s.color}40`,
+                  color: s.color,
+                }}
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </>
       )}

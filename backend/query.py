@@ -48,6 +48,7 @@ def get_ai_reply(
     history_text: str = "",
     religion: str = "hinduism",
     scripture: str = "Bhagavad Gita",
+    pdf_namespaces: list[str] = None
 ):
     if is_harmful_query(query):
         return "I cannot guide you toward harm. But I can help you calm your mind. Tell me what you are feeling."
@@ -66,6 +67,15 @@ def get_ai_reply(
         namespace = "gurugrantsahib"
 
     context_docs = similarity_search(query, namespace=namespace, k=3)
+
+    if pdf_namespaces:
+        for ns in pdf_namespaces:
+            try:
+                pdf_docs = similarity_search(query, namespace=ns, k=2)
+                context_docs.extend(pdf_docs)
+            except Exception as e:
+                print(f"Error querying PDF namespace {ns}: {e}")
+
     context = "\n\n".join([d.page_content for d in context_docs])
 
     system_prompt = f"""
@@ -73,14 +83,15 @@ You are a wise and compassionate guide representing the teachings of {scripture}
 
 Rules:
 1. Match the user’s tone.
-2. Use wisdom from the {scripture} only when natural.
-3. If using a verse or quote:
+2. The user may have uploaded documents or PDFs. Their text has been extracted and is provided to you in the Context below. If they ask about their PDFs/files, answer them using the Context. DO NOT say you cannot read PDFs.
+3. Use wisdom from the {scripture} only when natural.
+4. If using a verse or quote from the scripture:
    - Write it in this exact format:
      [VERSE title="<Reference>"]
      <actual verse text here>
      [/VERSE]
    - Example: [VERSE title="{scripture} Chapter 2, Verse 47"] You have a right to perform your prescribed duty... [/VERSE]
-4. After the tile, continue your explanation normally.
+   - After the tile, continue your explanation normally.
 5. Do NOT invent verses. Only use verses you know from {scripture}.
 6. English should be very simple and easy to understand.
 7. Respond in the user's language.

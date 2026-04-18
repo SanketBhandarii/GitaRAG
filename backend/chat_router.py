@@ -45,7 +45,7 @@ class ChatSessionResponse(BaseModel):
     created_at: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 class ChatMessageResponse(BaseModel):
@@ -58,7 +58,7 @@ class ChatMessageResponse(BaseModel):
     created_at: str
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 
 @router.post("/sessions")

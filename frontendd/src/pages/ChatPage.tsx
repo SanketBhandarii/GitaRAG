@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, Bookmark, Volume2, Square, Menu, Plus, MessageSquare, X, Trash2, SendHorizontalIcon, LogOut, Check } from "lucide-react";
+import { ArrowLeft, Copy, Bookmark, Volume2, Square, Menu, Plus, MessageSquare, X, Trash2, SendHorizontalIcon, LogOut, Check, FileText, Loader2 } from "lucide-react";
 import { getScripture, getReligionByScriptureId, type ChatMessage } from "@/data/mockData";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import {
@@ -66,6 +66,10 @@ const ChatPage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [sessionToDelete, setSessionToDelete] = useState<string | null>(null);
 
+  const [uploadedPdfs, setUploadedPdfs] = useState<{ id: number; filename: string }[]>([]);
+  const [uploadingPdf, setUploadingPdf] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -107,6 +111,7 @@ const ChatPage = () => {
   const loadSession = async (sessionId: string) => {
     setCurrentSessionId(sessionId);
     setIsSidebarOpen(false);
+    fetchPdfs(sessionId);
     try {
       const res = await fetch(`${BACKEND_URL}/api/chat/messages/${sessionId}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -150,6 +155,7 @@ const ChatPage = () => {
         setSessions([newSession, ...sessions]);
         setCurrentSessionId(newSession.id);
         setMessages([]);
+        setUploadedPdfs([]);
         return newSession.id;
       }
     } catch (e) {
@@ -175,6 +181,73 @@ const ChatPage = () => {
       console.error("Failed to delete session", e);
     } finally {
       setSessionToDelete(null);
+    }
+  };
+
+  const fetchPdfs = async (sessionId: string) => {
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/chat/sessions/${sessionId}/pdfs`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setUploadedPdfs(await res.json());
+      } else {
+        setUploadedPdfs([]);
+      }
+    } catch (e) {
+      console.error(e);
+      setUploadedPdfs([]);
+    }
+  };
+
+  const handleDeletePdf = async (pdfId: number) => {
+    // Optimistic UI Update for instant frontend feedback
+    setUploadedPdfs(prev => prev.filter(p => p.id !== pdfId));
+    
+    try {
+      await fetch(`${BACKEND_URL}/api/chat/pdfs/${pdfId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch (e) {
+      console.error("Failed to delete PDF", e);
+    }
+  };
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    let activeSessionId = currentSessionId;
+    if (!activeSessionId) {
+      activeSessionId = await createNewSession();
+      if (!activeSessionId) return;
+    }
+
+    setUploadingPdf(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("session_id", activeSessionId);
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/chat/upload-pdf`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
+      });
+      
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.detail || "Upload failed");
+      } else {
+        fetchPdfs(activeSessionId);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Failed to connect to server for upload");
+    } finally {
+      setUploadingPdf(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
 
@@ -356,8 +429,8 @@ const ChatPage = () => {
 
       <div className="flex-1 flex flex-col min-w-0 h-screen transition-all duration-300">
 
-        <header className="sticky top-0 z-40 glass border-b border-border/50 shrink-0">
-          <div className="flex items-center justify-between px-4 py-3 h-14">
+        <header className="sticky top-0 z-40 glass border-b border-border/50 shrink-0 flex flex-col">
+          <div className="flex items-center justify-between px-4 py-3 h-14 shrink-0">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -375,6 +448,7 @@ const ChatPage = () => {
             </div>
             <div className="hidden md:block"><ThemeToggle /></div>
           </div>
+          
         </header>
 
         <div className="flex-1 overflow-y-auto w-full relative">
@@ -506,6 +580,29 @@ const ChatPage = () => {
 
         <div className="shrink-0 p-4 pb-6 bg-background">
           <div className="max-w-3xl mx-auto">
+            {/* Session PDF Attachments (Restored below to input region) */}
+            {(uploadedPdfs.length > 0 || uploadingPdf) && (
+              <div className="flex flex-wrap gap-2 mb-3">
+                {uploadedPdfs.map((pdf) => (
+                  <div key={pdf.id} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/80 border border-border/50 text-xs font-medium text-foreground group">
+                    <FileText className="w-3.5 h-3.5 opacity-70" />
+                    <span className="truncate max-w-[120px]">{pdf.filename}</span>
+                    <button 
+                      onClick={() => handleDeletePdf(pdf.id)}
+                      className="ml-1 text-muted-foreground hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+                {uploadingPdf && (
+                  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-xs font-medium text-primary">
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Understanding PDF...</span>
+                  </div>
+                )}
+              </div>
+            )}
             <PromptInput
               onSubmit={handleSend}
               className="bg-secondary/40 rounded-2xl transition-all"
@@ -527,15 +624,25 @@ const ChatPage = () => {
               </PromptInputBody>
               <PromptInputFooter className="bg-transparent tracking-tight">
                 <PromptInputTools>
-                  <PromptInputActionMenu>
-                    <PromptInputActionMenuTrigger
-                      className="text-muted-foreground hover:text-foreground"
-                      disabled={true}
-                    />
-                    <PromptInputActionMenuContent>
-                      <PromptInputActionAddAttachments />
-                    </PromptInputActionMenuContent>
-                  </PromptInputActionMenu>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      fileInputRef.current?.click();
+                    }}
+                    className="p-2 -ml-2 text-muted-foreground hover:text-foreground hover:bg-secondary/80 rounded-lg transition-colors flex items-center gap-2"
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span className="text-xs font-semibold">Upload PDF</span>
+                  </button>
+
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    ref={fileInputRef}
+                    style={{ display: "none" }}
+                    onChange={handlePdfUpload}
+                  />
                 </PromptInputTools>
                 {isLoading ? (
                   <button
