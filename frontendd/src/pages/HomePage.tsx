@@ -261,12 +261,11 @@ const HomePage = () => {
                 className="relative my-2 mb-6 rounded-2xl overflow-hidden cursor-pointer"
                 style={{
                   background: 'linear-gradient(135deg, hsl(var(--primary) / 0.10) 0%, hsl(var(--primary) / 0.04) 60%, transparent 100%)',
-                  border: '1px solid hsl(var(--primary) / 0.30)',
-                  boxShadow: '0 0 32px hsl(var(--primary) / 0.10), inset 0 1px 0 hsl(var(--primary) / 0.15)',
+
+
                 }}
               >
-                {/* Top glow line */}
-                <div className="absolute top-0 left-0 right-0 h-[1px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--primary) / 0.6), transparent)' }} />
+
 
                 {!showInsightPanel && !insight ? (
                   /* Compact teaser strip */
@@ -285,11 +284,11 @@ const HomePage = () => {
                       <button
                         onClick={handleGenerateInsight}
                         disabled={insightLoading}
-                        className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all hover:scale-105 active:scale-95 disabled:opacity-50"
+                        className="relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all disabled:opacity-50"
                         style={{ background: 'hsl(var(--primary))', color: 'white', boxShadow: '0 4px 20px hsl(var(--primary) / 0.45)' }}
                       >
-                        {insightLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                        See What My Chats Reveal
+                        {insightLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : ""}
+                        See What Your Chats Reveal
                       </button>
                     </div>
                   </div>
@@ -390,7 +389,7 @@ const HomePage = () => {
           </>
         )}
 
-<section className="mt-8">
+        <section className="mt-8">
           <div className="flex items-center gap-2 mb-4">
             <Sparkles className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Daily Wisdom</h2>
